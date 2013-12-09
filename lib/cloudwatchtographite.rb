@@ -1,6 +1,7 @@
 require_relative './cloudwatchtographite/version'
 require_relative './cloudwatchtographite/metricdefinition'
 require_relative './cloudwatchtographite/metricdimension'
+require_relative './cloudwatchtographite/loadmetrics'
 require 'socket'
 require 'fog'
 require 'pp'
