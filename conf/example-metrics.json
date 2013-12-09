@@ -7,7 +7,7 @@
       "unit": "Count/Second",
       "dimensions": [{
         "name":"LoadBalancerName",
-        "value":"FreeTrialsEU"
+        "value":"MyLoadBalancer"
       }]
     },
     {
@@ -16,7 +16,7 @@
       "statistics": [ "Average", "Minimum", "Maximum" ],
       "dimensions": [{
         "name":"InstanceId",
-        "value":"i-6f545c23"
+        "value":"i-abc123456"
       }]
     }
   ]

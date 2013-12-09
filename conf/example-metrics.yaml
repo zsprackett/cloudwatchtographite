@@ -11,7 +11,7 @@ metrics:
   dimensions:
     -
       name: LoadBalancerName
-      value: FreeTrialsEU
+      value: MyLoadBalancer
 -
   namespace: AWS/EC2
   metricname: CPUUtilization
@@ -22,4 +22,4 @@ metrics:
   dimensions:
     -
       name: InstanceId
-      value: i-6f545c23
+      value: i-abc123456

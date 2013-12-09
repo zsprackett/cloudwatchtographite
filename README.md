@@ -34,6 +34,60 @@ Usage
       -V, --version                    Print version and exit
       -h, --help                       help
 
+JSON Metrics Definition File
+----------------------------
+
+    {
+      "metrics": [
+        {
+          "namespace": "AWS/ELB",
+          "metricname": "RequestCount",
+          "statistics": [ "Average", "Minimum", "Maximum" ],
+          "dimensions": [{
+            "name":"LoadBalancerName",
+            "value":"MyLoadBalancer"
+          }]
+        },
+        {
+          "namespace": "AWS/EC2",
+          "metricname": "CPUUtilization",
+          "statistics": [ "Average", "Minimum", "Maximum" ],
+          "dimensions": [{
+            "name":"InstanceId",
+            "value":"i-abc123456"
+          }]
+        }
+      ]
+    }
+
+YAML Metrics Definition File
+----------------------------
+
+    ---
+    metrics:
+    -
+    namespace: AWS/ELB
+    metricname: RequestCount
+    statistics:
+        - Average
+        - Minimum
+        - Maximum
+    dimensions:
+        -
+        name: LoadBalancerName
+        value: MyLoadBalancer
+    -
+    namespace: AWS/EC2
+    metricname: CPUUtilization
+    statistics:
+        - Average
+        - Minimum
+        - Maximum
+    dimensions:
+        -
+        name: InstanceId
+        value: i-abc123456
+
 Author
 ------
 
