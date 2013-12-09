@@ -66,27 +66,27 @@ YAML Metrics Definition File
     ---
     metrics:
     -
-    namespace: AWS/ELB
-    metricname: RequestCount
-    statistics:
+      namespace: AWS/ELB
+      metricname: RequestCount
+      statistics:
         - Average
         - Minimum
         - Maximum
-    dimensions:
+      dimensions:
         -
-        name: LoadBalancerName
-        value: MyLoadBalancer
+          name: LoadBalancerName
+          value: MyLoadBalancer
     -
-    namespace: AWS/EC2
-    metricname: CPUUtilization
-    statistics:
+      namespace: AWS/EC2
+      metricname: CPUUtilization
+      statistics:
         - Average
         - Minimum
         - Maximum
-    dimensions:
+      dimensions:
         -
-        name: InstanceId
-        value: i-abc123456
+          name: InstanceId
+          value: i-abc123456
 
 Author
 ------
