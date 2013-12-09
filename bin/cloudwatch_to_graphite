@@ -21,6 +21,7 @@ options = {
   :secret_key       => ENV['AWS_SECRET_ACCESS_KEY'],
   :graphite_server  => 'localhost',
   :graphite_port    => 2003,
+  :carbon_prefix    => 'cloudwatch',
   :verbose          => false
 }
 opt_parser = OptionParser.new do |opt|
@@ -49,6 +50,9 @@ opt_parser = OptionParser.new do |opt|
   end
   opt.on("-P","--graphite-port=port", Integer, "Graphite Port (Default: #{options[:graphite_port]})") do |port|
     options[:graphite_port] = port
+  end
+  opt.on("-c","--carbon_prefix", "Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
+    options[:carbon_prefix] = prefix
   end
   opt.on("-v","--verbose","Increase verbosity") do
     options[:verbose] = true
@@ -106,6 +110,7 @@ cwtg = CloudwatchToGraphite::Base.new(
   options[:verbose]
 )
 
+cwtg.carbon_prefix = options[:carbon_prefix]
 cwtg.protocol = options[:protocol]
 cwtg.graphite_server = options[:graphite_server]
 cwtg.graphite_port = options[:graphite_port]

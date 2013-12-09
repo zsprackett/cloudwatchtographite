@@ -29,6 +29,7 @@ Usage
       -r, --region=us-east-1           AWS Region (Default: us-east-1)
       -g, --graphite-server=host       Graphite Server (Default: localhost)
       -P, --graphite-port=port         Graphite Port (Default: 2003)
+      -c, --carbon_prefix              Carbon Prefix (Default: cloudwatch)
       -v, --verbose                    Increase verbosity
       -V, --version                    Print version and exit
       -h, --help                       help
