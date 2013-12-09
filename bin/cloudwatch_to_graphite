@@ -1,8 +1,16 @@
 #!/usr/bin/env ruby
 
-require './lib/cloudwatchtographite'
 require 'optparse'
 require 'pp'
+
+begin
+  require 'cloudwatchtographite'
+rescue LoadError
+  dev_path = File.join(File.dirname(__FILE__), '..', 'lib')
+  $:.unshift(dev_path)
+  require 'cloudwatchtographite'
+end
+
 
 def load_json_file(filename)
   if not File.readable?(filename)
