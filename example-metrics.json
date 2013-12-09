@@ -1,0 +1,23 @@
+{
+  "metrics": [
+    {
+      "namespace": "AWS/ELB",
+      "metricname": "RequestCount",
+      "statistics": [ "Average", "Minimum", "Maximum" ],
+      "unit": "Count/Second",
+      "dimensions": [{
+        "name":"LoadBalancerName",
+        "value":"FreeTrialsEU"
+      }]
+    },
+    {
+      "namespace": "AWS/EC2",
+      "metricname": "CPUUtilization",
+      "statistics": [ "Average", "Minimum", "Maximum" ],
+      "dimensions": [{
+        "name":"InstanceId",
+        "value":"i-6f545c23"
+      }]
+    }
+  ]
+}

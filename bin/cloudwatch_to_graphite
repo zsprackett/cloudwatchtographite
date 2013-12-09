@@ -1,0 +1,110 @@
+#!/usr/bin/env ruby
+
+require './lib/cloudwatchtographite'
+require 'optparse'
+require 'pp'
+
+def load_json_file(filename)
+  if not File.readable?(filename)
+    warn "Unable to read %s" % filename
+    return false
+  end
+  File.open(filename, 'r') do |f|
+    return JSON.load(f)
+  end
+end
+
+# default options
+options = {
+  :protocol         => 'udp',
+  :region           => ENV.has_key?('AWS_DEFAULT_REGION') ?
+    ENV['AWS_DEFAULT_REGION'] : 'us-east-1',
+  :access_key       => ENV['AWS_ACCESS_KEY_ID'],
+  :secret_key       => ENV['AWS_SECRET_ACCESS_KEY'],
+  :graphite_server  => 'localhost',
+  :graphite_port    => 2003,
+  :verbose          => false
+}
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: %s [OPTIONS]" % File.basename($0)
+  opt.separator  ""
+  opt.on("-a","--access_key=KEY","AWS Access Key") do |key|
+    options[:access_key] = key
+  end
+  opt.on("-s","--secret_key=KEY","AWS Secret Access Key") do |key|
+    options[:secret_key] = key
+  end
+  opt.on("-m","--metrics_file=FILE","Path to JSON metrics file") do |file|
+    options[:metrics_file] = file
+  end
+  opt.on("-p","--protocol=udp","TCP or UDP (Default: #{options[:protocol]})") do |protocol|
+    options[:protocol] = protocol
+  end
+  opt.on("-r","--region=us-east-1","AWS Region (Default: #{options[:region]})") do |region|
+    options[:region] = region
+  end
+  opt.on("-g","--graphite-server=host","Graphite Server (Default: #{options[:graphite_server]})") do |server|
+    options[:graphite_server] = server
+  end
+  opt.on("-P","--graphite-port=port", Integer, "Graphite Port (Default: #{options[:graphite_port]})") do |port|
+    options[:graphite_port] = port
+  end
+  opt.on("-v","--verbose","Increase verbosity") do
+    options[:verbose] = true
+  end
+  opt.on("-V","--version","Print version and exit") do
+    puts File.basename($0) + " " + CloudwatchToGraphite::VERSION::STRING
+    exit 0
+  end
+  opt.on("-h","--help","help") do
+    puts opt_parser
+    exit 1
+  end
+end
+begin
+  opt_parser.parse!
+  mandatory = [ :access_key, :secret_key, :metrics_file ]
+  missing = mandatory.select{ |param| options[param].nil? }
+  if not missing.empty?
+    puts "Missing options: #{missing.join(', ')}"
+    puts opt_parser
+    exit 1
+  end
+rescue OptionParser::InvalidOption => e
+  puts "Error: #{e}"
+  puts
+  puts opt_parser
+  exit 1
+end
+
+contents = load_json_file options[:metrics_file]
+unless contents != false and contents.has_key?('metrics') and contents['metrics'].kind_of?(Array)
+  warn "Metrics file does not contain metrics!"
+  exit 1
+end
+metrics = []
+contents['metrics'].each do |m|
+  parsed = CloudwatchToGraphite::MetricDefinition::create_and_fill m
+  if (parsed != false)
+    metrics.push(parsed)
+  else
+    warn "Failed to parse #{m}"
+  end
+end
+
+cwtg = CloudwatchToGraphite::Base.new(
+  options[:access_key],
+  options[:secret_key],
+  options[:region],
+  options[:verbose]
+)
+
+cwtg.protocol = options[:protocol]
+cwtg.graphite_server = options[:graphite_server]
+cwtg.graphite_port = options[:graphite_port]
+
+if cwtg.fetch_and_forward(metrics)
+  exit 0
+else
+  exit 1
+end
