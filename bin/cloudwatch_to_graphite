@@ -26,10 +26,10 @@ options = {
 opt_parser = OptionParser.new do |opt|
   opt.banner = "Usage: %s [OPTIONS]" % File.basename($0)
   opt.separator  ""
-  opt.on("-a","--access_key=KEY","AWS Access Key") do |key|
+  opt.on("-a","--access_key=KEY","AWS Access Key (Falls back to ENV['AWS_ACCESS_KEY_ID'])") do |key|
     options[:access_key] = key
   end
-  opt.on("-s","--secret_key=KEY","AWS Secret Access Key") do |key|
+  opt.on("-s","--secret_key=KEY","AWS Secret Access Key (Falls back to ENV['AWS_SECRET_ACCESS_KEY'])") do |key|
     options[:secret_key] = key
   end
   opt.on("-j","--json_metrics=FILE","Path to JSON metrics file") do |file|
