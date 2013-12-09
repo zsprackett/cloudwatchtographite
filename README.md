@@ -6,9 +6,9 @@ library to connect to the Amazon APIs.  It can parse a list of metric
 definitions in either JSON or YAML formats.  It will take the results and
 submit them to a Graphite server of your choosing.
 
-[Fog](https://github.com/fog/fog)
-[Graphite](http://graphite.wikidot.com/)
-[AWS CloudWatch](http://aws.amazon.com/cloudwatch/)
+- [Fog](https://github.com/fog/fog)
+- [Graphite](http://graphite.wikidot.com/)
+- [AWS CloudWatch](http://aws.amazon.com/cloudwatch/)
 
 Usage
 -----
