@@ -10,6 +10,12 @@ submit them to a Graphite server of your choosing.
 - [Graphite](http://graphite.wikidot.com/)
 - [AWS CloudWatch](http://aws.amazon.com/cloudwatch/)
 
+[![Build
+Status](https://travis-ci.org/zsprackett/cloudwatchtographite.png?branch=master)](https://travis-ci.org/zsprackett/cloudwatchtographite)
+[![Code
+Climate](https://codeclimate.com/github/zsprackett/cloudwatchtographite.png)](https://codeclimate.com/github/zsprackett/cloudwatchtographite)
+
+
 Usage
 -----
 
