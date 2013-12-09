@@ -18,12 +18,12 @@ Jeweler::Tasks.new do |gem|
   gem.name = "cloudwatchtographite"
   gem.homepage = "http://github.com/zsprackett/cloudwatchtographite"
   gem.license = "MIT"
-  gem.summary = %Q{Cloudwatch to Graphite}
-  gem.description = %Q{Pull statistics from Amazon Cloudwatch into Graphite}
+  gem.summary = %Q{CloudWatch Metrics to Graphite}
+  gem.description = %Q{Pull statistics from Amazon CloudWatch into Graphite}
   gem.email = "zac@sprackett.com"
   gem.authors = ["S. Zachariah Sprackett"]
   gem.version = CloudwatchToGraphite::VERSION::STRING
-  # dependencies defined in Gemfile
+  gem.executables = ["cloudwatch_to_graphite"]
 end
 Jeweler::RubygemsDotOrgTasks.new
 
