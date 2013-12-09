@@ -109,7 +109,6 @@ cwtg = CloudwatchToGraphite::Base.new(
   options[:region],
   options[:verbose]
 )
-pp options[:carbon_prefix]
 
 cwtg.carbon_prefix = options[:carbon_prefix]
 cwtg.protocol = options[:protocol]
