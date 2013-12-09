@@ -21,15 +21,15 @@ Usage
 
     Usage: cloudwatch_to_graphite [OPTIONS]
     
-      -a, --access_key=KEY             AWS Access Key (Falls back to ENV['AWS_ACCESS_KEY_ID'])
-      -s, --secret_key=KEY             AWS Secret Access Key (Falls back to ENV['AWS_SECRET_ACCESS_KEY'])
-      -j, --json_metrics=FILE          Path to JSON metrics file
-      -y, --yaml_metrics=FILE          Path to YAML metrics file
+      -a, --access-key=KEY             AWS Access Key (Falls back to ENV['AWS_ACCESS_KEY_ID'])
+      -s, --secret-key=KEY             AWS Secret Access Key (Falls back to ENV['AWS_SECRET_ACCESS_KEY'])
+      -j, --json-metrics=FILE          Path to JSON metrics file
+      -y, --yaml-metrics=FILE          Path to YAML metrics file
       -p, --protocol=udp               TCP or UDP (Default: udp)
       -r, --region=us-east-1           AWS Region (Default: us-east-1)
       -g, --graphite-server=host       Graphite Server (Default: localhost)
       -P, --graphite-port=port         Graphite Port (Default: 2003)
-      -c, --carbon_prefix              Carbon Prefix (Default: cloudwatch)
+      -c, --carbon-prefix              Carbon Prefix (Default: cloudwatch)
       -v, --verbose                    Increase verbosity
       -V, --version                    Print version and exit
       -h, --help                       help

@@ -27,16 +27,16 @@ options = {
 opt_parser = OptionParser.new do |opt|
   opt.banner = "Usage: %s [OPTIONS]" % File.basename($0)
   opt.separator  ""
-  opt.on("-a","--access_key=KEY","AWS Access Key (Falls back to ENV['AWS_ACCESS_KEY_ID'])") do |key|
+  opt.on("-a","--access-key=KEY","AWS Access Key (Falls back to ENV['AWS_ACCESS_KEY_ID'])") do |key|
     options[:access_key] = key
   end
-  opt.on("-s","--secret_key=KEY","AWS Secret Access Key (Falls back to ENV['AWS_SECRET_ACCESS_KEY'])") do |key|
+  opt.on("-s","--secret-key=KEY","AWS Secret Access Key (Falls back to ENV['AWS_SECRET_ACCESS_KEY'])") do |key|
     options[:secret_key] = key
   end
-  opt.on("-j","--json_metrics=FILE","Path to JSON metrics file") do |file|
+  opt.on("-j","--json-metrics=FILE","Path to JSON metrics file") do |file|
     options[:json_metrics] = file
   end
-  opt.on("-y","--yaml_metrics=FILE","Path to YAML metrics file") do |file|
+  opt.on("-y","--yaml-metrics=FILE","Path to YAML metrics file") do |file|
     options[:yaml_metrics] = file
   end
   opt.on("-p","--protocol=udp","TCP or UDP (Default: #{options[:protocol]})") do |protocol|
@@ -51,7 +51,7 @@ opt_parser = OptionParser.new do |opt|
   opt.on("-P","--graphite-port=port", Integer, "Graphite Port (Default: #{options[:graphite_port]})") do |port|
     options[:graphite_port] = port
   end
-  opt.on("-c","--carbon_prefix=prefix","Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
+  opt.on("-c","--carbon-prefix=prefix","Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
     options[:carbon_prefix] = prefix
   end
   opt.on("-v","--verbose","Increase verbosity") do
