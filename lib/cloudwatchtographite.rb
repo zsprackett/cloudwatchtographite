@@ -71,7 +71,7 @@ module CloudwatchToGraphite
       retval
     end
 
-    def get_metrics(metrics)
+    def get_datapoints(metrics)
       if metrics.kind_of?(CloudwatchToGraphite::MetricDefinition)
         raise ArgumentError
       end
@@ -84,38 +84,32 @@ module CloudwatchToGraphite
           data_points = @cloudwatch.get_metric_statistics(
             m.to_stringy_h
           ).body['GetMetricStatisticsResult']['Datapoints']
+          warn "Received:\n%s" % PP.pp(data_points, "") if @verbose
+          data_points = order_data_points(data_points)
+          # if we aren't already an array, become one
+          m.Statistics.each do |stat|
+            name = @carbon_prefix.empty? ? '' : "#{@carbon_prefix}."
+            name += m.graphite_path(stat)
+
+            data_points.each do |d|
+              ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
+            end
+          end
         rescue Excon::Errors::SocketError => e
           warn "Socket error #{e}"
         rescue Excon::Errors::BadRequest => e
           warn "Bad request #{e}"
-        end
-        warn "Received:\n%s" % PP.pp(data_points, "") if @verbose
-
-        if not data_points.kind_of?(Array)
-          data_points = [ data_points ]
-        elsif data_points.length == 0
-          warn "No data points!"
-        else
-          # sort in chronological order
-          data_points = data_points.sort_by {|array| array['Timestamp'] }
-        end
-
-        # if we aren't already an array, become one
-        m.Statistics.each do |stat|
-          name = @carbon_prefix.empty? ? '' : "#{@carbon_prefix}."
-          name += m.graphite_path(stat)
-
-          data_points.each do |d|
-            ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
-          end
+        rescue Excon::Errors::Forbidden => e
+          warn "Permission denied #{e}"
         end
       end
+
       warn "Returning:\n%s" % PP.pp(ret, "") if @verbose
       ret
     end
 
     def fetch_and_forward(metrics)
-      results = self.get_metrics(metrics)
+      results = self.get_datapoints(metrics)
       if results.length == 0
         return false
       else
@@ -129,6 +123,23 @@ module CloudwatchToGraphite
           return false
         end
       end
+    end
+
+    private
+    def order_data_points(data_points)
+      if data_points.nil?
+        data_points = []
+      elsif not data_points.kind_of?(Array)
+        data_points = [ data_points ]
+      end
+
+      if data_points.length == 0
+        warn "No data points!"
+      else
+        # sort in chronological order
+        data_points = data_points.sort_by {|array| array['Timestamp'] }
+      end
+      data_points
     end
   end
 end

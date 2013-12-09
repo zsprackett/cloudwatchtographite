@@ -51,7 +51,7 @@ opt_parser = OptionParser.new do |opt|
   opt.on("-P","--graphite-port=port", Integer, "Graphite Port (Default: #{options[:graphite_port]})") do |port|
     options[:graphite_port] = port
   end
-  opt.on("-c","--carbon_prefix", "Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
+  opt.on("-c","--carbon_prefix=prefix","Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
     options[:carbon_prefix] = prefix
   end
   opt.on("-v","--verbose","Increase verbosity") do
@@ -109,6 +109,7 @@ cwtg = CloudwatchToGraphite::Base.new(
   options[:region],
   options[:verbose]
 )
+pp options[:carbon_prefix]
 
 cwtg.carbon_prefix = options[:carbon_prefix]
 cwtg.protocol = options[:protocol]
