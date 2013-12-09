@@ -131,29 +131,36 @@ module CloudwatchToGraphite
 
     def self.create_and_fill(definition)
       md = MetricDefinition.new
-      md.Namespace = definition['namespace'] if (definition.has_key? 'namespace')
-      md.MetricName = definition['metricname'] if (definition.has_key? 'metricname')
       # FIXME: add start and end time parsing
-      md.Period = definition['period'] if (definition.has_key? 'period')
-      if definition.has_key? 'statistics'
-        if definition['statistics'].kind_of?(Array)
-          definition['statistics'].each do |stat|
+      definition.each_key do |k|
+        case k
+        when 'namespace'
+          md.Namespace = definition[k]
+        when 'metricname'
+          md.MetricName = definition[k]
+        when 'period'
+          md.Period = definition[k]
+        when 'unit'
+          md.Unit = definition[k]
+        when 'statistics'
+          if not definition[k].kind_of?(Array)
+            definition[k] = [ definition[k] ]
+          end
+          definition[k].each do |stat|
             md.add_statistic(stat)
           end
-        else
-          md.add_statistic(definition['statistics'])
-        end
-      end
-      if definition.has_key? 'dimensions'
-        if definition['dimensions'].kind_of?(Array)
-          definition['dimensions'].each do |d|
-            md.add_dimension(d['name'], d['value'])
+        when 'dimensions'
+          if not definition[k].kind_of?(Array)
+            definition[k] = [ definition[k] ]
+          end
+          definition[k].each do |dimension|
+            md.add_dimension(dimension['name'], dimension['value'])
           end
         else
-          md.add_dimension(definition['dimensions']['name'], definition['dimensions']['value'])
+          warn "Ignoring unknown metric definition key #{key}"
         end
       end
-      md.Unit = definition['unit'] if (definition.has_key? 'unit')
+
       if md.valid?
         return md
       else
