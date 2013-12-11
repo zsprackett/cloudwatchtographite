@@ -1,3 +1,18 @@
+# _*_ coding: utf-8 _*_
+# == Synopsis
+# CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
+# and passes them on to a graphite server
+#
+# == Author
+# S. Zachariah Sprackett <zac@sprackett.com>
+#
+# == License
+# The MIT License (MIT)
+#
+# == Copyright
+# Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
+#
+require 'time'
 require 'hashifiable'
 
 module CloudwatchToGraphite
@@ -62,27 +77,27 @@ module CloudwatchToGraphite
 
     def StartTime=(time)
       raise ArgumentError unless time.kind_of?(Time)
-      @StartTime=time.iso8601
+      @StartTime=time
     end
 
     def StartTime
       if @StartTime.nil?
-        return (Time.now-600).iso8601
+        (Time.now-600).iso8601
       else
-        return @StartTime
+        @StartTime.iso8601
       end
     end
 
     def EndTime=(time)
       raise ArgumentError unless time.kind_of?(Time)
-      @EndTime=time.iso8601
+      @EndTime=time
     end
 
     def EndTime
       if @EndTime.nil?
-        return Time.now.iso8601
+        Time.now.iso8601
       else
-        return @EndTime
+        @EndTime.iso8601
       end
     end
 
@@ -102,8 +117,9 @@ module CloudwatchToGraphite
 
     def add_statistic(n)
       raise ArgumentError unless STATISTICS.include? n
-      return if @Statistics.include? n
-      @Statistics.push(n)
+      if not @Statistics.include? n
+        @Statistics.push(n)
+      end
     end
 
     def add_dimension(name, value)
@@ -115,9 +131,9 @@ module CloudwatchToGraphite
 
     def valid?
       if @Namespace.nil? or @MetricName.nil? or @Statistics.empty? or @Dimensions.empty? or @Unit.nil?
-        return false
+        false
       else
-        return true
+        true
       end
     end
 
@@ -126,18 +142,29 @@ module CloudwatchToGraphite
      @Dimensions.each do |d|
        path += "." + d.Value
      end
-     return path.gsub('/', '.').downcase
+     path.gsub('/', '.').downcase
     end
 
     def self.create_and_fill(definition)
       md = MetricDefinition.new
-      # FIXME: add start and end time parsing
       definition.each_key do |k|
         case k
         when 'namespace'
           md.Namespace = definition[k]
         when 'metricname'
           md.MetricName = definition[k]
+        when 'starttime'
+          begin
+            md.StartTime = Time.parse(definition[k])
+          rescue ArgumentError
+            warn "Ignoring malformed starttime of #{definition[k]}"
+          end
+        when 'endtime'
+          begin
+            md.EndTime = Time.parse(definition[k])
+          rescue ArgumentError
+            warn "Ignoring malformed endtime of #{definition[k]}"
+          end
         when 'period'
           md.Period = definition[k]
         when 'unit'
@@ -154,17 +181,21 @@ module CloudwatchToGraphite
             definition[k] = [ definition[k] ]
           end
           definition[k].each do |dimension|
-            md.add_dimension(dimension['name'], dimension['value'])
+            if dimension.has_key?('name') and dimension.has_key?('value')
+              md.add_dimension(dimension['name'], dimension['value'])
+            else
+              warn "Ignoring unknown dimension "
+            end
           end
         else
-          warn "Ignoring unknown metric definition key #{key}"
+          warn "Ignoring unknown metric definition #{key}"
         end
       end
 
       if md.valid?
-        return md
+        md
       else
-        return false
+        false
       end
     end
   end

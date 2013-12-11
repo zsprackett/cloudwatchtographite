@@ -1,3 +1,17 @@
+# _*_ coding: utf-8 _*_
+# == Synopsis
+# CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
+# and passes them on to a graphite server
+#
+# == Author
+# S. Zachariah Sprackett <zac@sprackett.com>
+#
+# == License
+# The MIT License (MIT)
+#
+# == Copyright
+# Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
+#
 require_relative './cloudwatchtographite/version'
 require_relative './cloudwatchtographite/metricdefinition'
 require_relative './cloudwatchtographite/metricdimension'
@@ -9,9 +23,9 @@ require 'pp'
 module CloudwatchToGraphite
   class Base
     attr_accessor :protocol
-    attr_accessor :carbon_prefix
     attr_accessor :graphite_server
     attr_accessor :graphite_port
+    attr_reader   :carbon_prefix
 
     def initialize(aws_access_key, aws_secret_key, region, verbose=false)
       @protocol        = 'udp'
@@ -20,7 +34,7 @@ module CloudwatchToGraphite
       @graphite_port   = 2003
       @verbose         = verbose
 
-      warn "Fog setting up for region %s" % region if @verbose
+      debug_log "Fog setting up for region %s" % region
 
       @cloudwatch = Fog::AWS::CloudWatch.new(
         :aws_access_key_id => aws_access_key,
@@ -33,16 +47,16 @@ module CloudwatchToGraphite
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
 
-      warn "Attempting to send %d bytes to %s:%d via udp" % [
+      debug_log "Attempting to send %d bytes to %s:%d via udp" % [
         contents.length, @graphite_server, @graphite_port
-      ] if @verbose
+      ]
 
       begin
         sock = UDPSocket.open
         sock.send(contents, 0, @graphite_server, @graphite_port)
         retval = true
       rescue Exception => e
-        warn "Caught exception! [#{e}]" if @verbose
+        debug_log "Caught exception! [#{e}]"
         retval = false
       ensure
         sock.close if sock
@@ -54,17 +68,17 @@ module CloudwatchToGraphite
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
 
-      warn "Attempting to send %d bytes to %s:%d via tcp" % [
+      debug_log "Attempting to send %d bytes to %s:%d via tcp" % [
         contents.length, @graphite_server, @graphite_port
-      ] if @verbose
+      ]
 
+      retval = false
       begin
         sock = TCPSocket.open(@graphite_server, @graphite_port)
         sock.print(contents)
         retval = true
       rescue Exception => e
-        warn "Caught exception! [#{e}]" if @verbose
-        retval = false
+        debug_log "Caught exception! [#{e}]"
       ensure
         sock.close if sock
       end
@@ -78,51 +92,56 @@ module CloudwatchToGraphite
 
       ret = []
       metrics.each do |m|
-        data_points = []
-        warn "Sending:\n%s" % PP.pp(m.to_stringy_h, "") if @verbose
+        debug_log "Sending:\n%s" % PP.pp(m.to_stringy_h, "")
         begin
           data_points = @cloudwatch.get_metric_statistics(
             m.to_stringy_h
           ).body['GetMetricStatisticsResult']['Datapoints']
-          warn "Received:\n%s" % PP.pp(data_points, "") if @verbose
+          debug_log "Received:\n%s" % PP.pp(data_points, "")
           data_points = order_data_points(data_points)
-          # if we aren't already an array, become one
+
           m.Statistics.each do |stat|
-            name = @carbon_prefix.empty? ? '' : "#{@carbon_prefix}."
-            name += m.graphite_path(stat)
+            name = "%s.%s" % [ @carbon_prefix,  m.graphite_path(stat) ]
 
             data_points.each do |d|
               ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
             end
           end
         rescue Excon::Errors::SocketError => e
-          warn "Socket error #{e}"
+          warn "[Socket Error] #{e}"
         rescue Excon::Errors::BadRequest => e
-          warn "Bad request #{e}"
+          warn "[Bad Request] #{e}"
         rescue Excon::Errors::Forbidden => e
-          warn "Permission denied #{e}"
+          warn "[Permission Denied] #{e}"
         end
       end
 
-      warn "Returning:\n%s" % PP.pp(ret, "") if @verbose
+      debug_log "Returning:\n%s" % PP.pp(ret, "")
       ret
     end
 
     def fetch_and_forward(metrics)
-      results = self.get_datapoints(metrics)
+      results = get_datapoints(metrics)
       if results.length == 0
-        return false
+        false
       else
         case @protocol
         when 'tcp'
-          return self.send_tcp(results)
+          send_tcp(results)
         when 'udp'
-          return self.send_udp(results)
+          send_udp(results)
         else
           warn "Unknown protocol %s" % @protocol
-          return false
+          false
         end
       end
+    end
+
+    def carbon_prefix=(p)
+      if not p.kind_of?(String) or not p.length > 0
+        raise ArgumentError
+      end
+      @carbon_prefix=p
     end
 
     private
@@ -135,11 +154,17 @@ module CloudwatchToGraphite
 
       if data_points.length == 0
         warn "No data points!"
+        data_points
       else
-        # sort in chronological order
         data_points = data_points.sort_by {|array| array['Timestamp'] }
       end
-      data_points
     end
+
+    def debug_log(s)
+      if @verbose
+        warn s
+      end
+    end
+
   end
 end
