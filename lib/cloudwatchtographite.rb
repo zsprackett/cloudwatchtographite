@@ -107,12 +107,10 @@ module CloudwatchToGraphite
               ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
             end
           end
-        rescue Excon::Errors::SocketError => e
-          warn "[Socket Error] #{e}"
-        rescue Excon::Errors::BadRequest => e
-          warn "[Bad Request] #{e}"
-        rescue Excon::Errors::Forbidden => e
-          warn "[Permission Denied] #{e}"
+        rescue Excon::Errors::SocketError, Excon::Errors::BadRequest => e
+          warn "[Error in CloudWatch call] %s" % e.message
+        rescue Excon::Errors::Forbidden
+          warn "[Error in CloudWatch call] permission denied - check keys!"
         end
       end
 

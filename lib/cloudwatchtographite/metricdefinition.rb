@@ -133,15 +133,11 @@ module CloudwatchToGraphite
       end
     end
 
-    def add_dimension(name, value)
-      # maximum of 10 dimensions
-      raise ArgumentError unless @Dimensions.length < 10
-      d = MetricDimension.new(name, value)
-      @Dimensions.push(d)
-    end
-
-    def valid_dimension_hash?(d)
-      if d.has_key?('name') and d.has_key?('value')
+    def add_dimension(dimension)
+      if dimension.kind_of?(Hash) and dimension.has_key?('name') and dimension.has_key?('value')
+        # maximum of 10 dimensions
+        raise ArgumentError unless @Dimensions.length < 10
+        @Dimensions.push(MetricDimension.new(dimension['name'], dimension['value']))
         true
       else
         false
@@ -182,9 +178,7 @@ module CloudwatchToGraphite
           end
         when 'dimensions'
           Array(definition[k]).each do |dimension|
-            if valid_dimension_hash?(dimension)
-              md.add_dimension(dimension['name'], dimension['value'])
-            else
+            if not md.add_dimension(dimension)
               warn "Ignoring unknown dimension #{dimension}"
             end
           end
