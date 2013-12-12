@@ -140,6 +140,14 @@ module CloudwatchToGraphite
       @Dimensions.push(d)
     end
 
+    def valid_dimension_hash?(d)
+      if d.has_key?('name') and d.has_key?('value')
+        true
+      else
+        false
+      end
+    end
+
     def valid?
       if @Namespace.nil? or @MetricName.nil? or @Statistics.empty? or @Dimensions.empty? or @Unit.nil?
         false
@@ -174,10 +182,10 @@ module CloudwatchToGraphite
           end
         when 'dimensions'
           Array(definition[k]).each do |dimension|
-            if dimension.has_key?('name') and dimension.has_key?('value')
+            if valid_dimension_hash?(dimension)
               md.add_dimension(dimension['name'], dimension['value'])
             else
-              warn "Ignoring unknown dimension "
+              warn "Ignoring unknown dimension #{dimension}"
             end
           end
         else
