@@ -19,4 +19,5 @@ end
 group :test do
   gem 'rspec'
   gem 'cucumber'
+  gem 'coveralls', require: false
 end
