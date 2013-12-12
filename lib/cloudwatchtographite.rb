@@ -148,8 +148,8 @@ module CloudwatchToGraphite
     def order_data_points(data_points)
       if data_points.nil?
         data_points = []
-      elsif not data_points.kind_of?(Array)
-        data_points = [ data_points ]
+      else
+        data_points = Array(data_points)
       end
 
       if data_points.length == 0

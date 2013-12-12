@@ -169,17 +169,11 @@ module CloudwatchToGraphite
             warn "Ignoring malformed #{k} of #{definition[k]}"
           end
         when 'statistics'
-          if not definition[k].kind_of?(Array)
-            definition[k] = [ definition[k] ]
-          end
-          definition[k].each do |stat|
+          Array(definition[k]).each do |stat|
             md.add_statistic(stat)
           end
         when 'dimensions'
-          if not definition[k].kind_of?(Array)
-            definition[k] = [ definition[k] ]
-          end
-          definition[k].each do |dimension|
+          Array(definition[k]).each do |dimension|
             if dimension.has_key?('name') and dimension.has_key?('value')
               md.add_dimension(dimension['name'], dimension['value'])
             else
@@ -191,11 +185,7 @@ module CloudwatchToGraphite
         end
       end
 
-      if md.valid?
-        md
-      else
-        false
-      end
+      md.valid? ? md : false
     end
   end
 end
