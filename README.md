@@ -13,6 +13,7 @@ submit them to a Graphite server of your choosing.
 [![Build Status](https://travis-ci.org/zsprackett/cloudwatchtographite.png?branch=master)](https://travis-ci.org/zsprackett/cloudwatchtographite)
 [![Code Climate](https://codeclimate.com/github/zsprackett/cloudwatchtographite.png)](https://codeclimate.com/github/zsprackett/cloudwatchtographite)
 [![Coverage Status](https://coveralls.io/repos/zsprackett/cloudwatchtographite/badge.png)](https://coveralls.io/r/zsprackett/cloudwatchtographite)
+[![Dependency Status](https://gemnasium.com/zsprackett/cloudwatchtographite.png)](https://gemnasium.com/zsprackett/cloudwatchtographite)
 
 
 Usage
