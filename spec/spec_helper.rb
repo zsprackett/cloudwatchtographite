@@ -1,10 +1,11 @@
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'rspec'
 require 'coveralls'
-require 'cloudwatchtographite'
-
+require 'rspec'
+# must come before app requires
 Coveralls.wear!
+
+require 'cloudwatchtographite'
 
 # Requires supporting files with custom matchers and macros, etc,
 # in ./support/ and its subdirectories.
