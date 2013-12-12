@@ -49,6 +49,17 @@ module CloudwatchToGraphite
     'SampleCount'
   ]
 
+  SETTER_MAPPINGS = {
+    'namespace'  => :Namespace=,
+    'metricname' => :MetricName=,
+    'statistics' => :Statistics=,
+    'starttime'  => :StartTime=,
+    'endtime'    => :EndTime=,
+    'period'     => :Period=,
+    'dimensions' => :Dimensions=,
+    'unit'       => :Unit=
+  }
+
   class MetricDefinition
     attr_reader :Namespace, :MetricName, :Statistics, :Unit, :Period
     extend Hashifiable
@@ -149,26 +160,14 @@ module CloudwatchToGraphite
       md = MetricDefinition.new
       definition.each_key do |k|
         case k
-        when 'namespace'
-          md.Namespace = definition[k]
-        when 'metricname'
-          md.MetricName = definition[k]
-        when 'starttime'
+        when 'namespace', 'metricname', 'period', 'unit'
+          md.send(SETTER_MAPPINGS[k], definition[k])
+        when 'starttime', 'endtime'
           begin
-            md.StartTime = Time.parse(definition[k])
+            md.send(SETTER_MAPPINGS[k], Time.parse(definition[k]))
           rescue ArgumentError
-            warn "Ignoring malformed starttime of #{definition[k]}"
+            warn "Ignoring malformed #{k} of #{definition[k]}"
           end
-        when 'endtime'
-          begin
-            md.EndTime = Time.parse(definition[k])
-          rescue ArgumentError
-            warn "Ignoring malformed endtime of #{definition[k]}"
-          end
-        when 'period'
-          md.Period = definition[k]
-        when 'unit'
-          md.Unit = definition[k]
         when 'statistics'
           if not definition[k].kind_of?(Array)
             definition[k] = [ definition[k] ]
