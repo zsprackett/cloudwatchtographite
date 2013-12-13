@@ -36,5 +36,13 @@ module CloudwatchToGraphite
       end
       @Value=n
     end
+
+    def self.create_and_fill(dhash)
+      if dhash.kind_of?(Hash) and dhash.has_key?('name') and dhash.has_key?('value')
+        MetricDimension.new(dhash['name'], dhash['value'])
+      else
+        false
+      end
+    end
   end
 end
