@@ -24,20 +24,12 @@ module CloudwatchToGraphite
     end
 
     def Name=(n)
-      if not n.kind_of?(String)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      elsif n.length >= 256
-        raise CloudwatchToGraphite::ArgumentLengthError
-      end
+      CloudwatchToGraphite::Validator::string_length(n, 256)
       @Name=n
     end
 
     def Value=(n)
-      if not n.kind_of?(String)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      elsif n.length >= 256
-        raise CloudwatchToGraphite::ArgumentLengthError
-      end
+      CloudwatchToGraphite::Validator::string_length(n, 256)
       @Value=n
     end
 

@@ -73,20 +73,12 @@ module CloudwatchToGraphite
     end
 
     def Namespace=(n)
-      if not n.kind_of?(String)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      elsif n.length >= 256
-        raise CloudwatchToGraphite::ArgumentLengthError
-      end
+      CloudwatchToGraphite::Validator::string_length(n, 256)
       @Namespace=n
     end
 
     def MetricName=(n)
-      if not n.kind_of?(String)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      elsif n.length >= 256
-        raise CloudwatchToGraphite::ArgumentLengthError
-      end
+      CloudwatchToGraphite::Validator::string_length(n, 256)
       @MetricName=n
     end
 
