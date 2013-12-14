@@ -22,6 +22,9 @@ describe CloudwatchToGraphite::MetricDefinition do
     it "should be a MetricDefinition" do
       @definition.should be_an_instance_of CloudwatchToGraphite::MetricDefinition
     end
+    it "should require valid arguments" do
+      expect { CloudwatchToGraphite::MetricDefinition.create_and_fill({'namespace' => 'blah'}) }.to raise_error(CloudwatchToGraphite::ParseError)
+    end
   end
 
   describe ".new" do

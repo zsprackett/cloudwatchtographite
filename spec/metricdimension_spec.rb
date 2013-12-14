@@ -13,6 +13,16 @@ describe CloudwatchToGraphite::MetricDimension do
     end
   end
 
+  describe ".create_and_fill" do
+    it "should return a MetricDimension" do
+      d= CloudwatchToGraphite::MetricDimension.create_and_fill({'name' => 'a', 'value' => 'b'})
+      d.should be_an_instance_of CloudwatchToGraphite::MetricDimension
+    end
+    it "should require valid arguments" do
+      expect { CloudwatchToGraphite::MetricDefinition.create_and_fill({'name' => 'blah'}) }.to raise_error(CloudwatchToGraphite::ParseError)
+    end
+  end
+
   describe ".Name" do
     it "returns the correct name" do
       @dimension.Name.should eql 'testname'

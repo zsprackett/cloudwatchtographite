@@ -28,6 +28,9 @@ module CloudwatchToGraphite
   # Raised when too many dimensions are specified
   class TooManyDimensionError < Exception; end
 
+  # Raised when parsing fails
+  class ParseError < Exception; end
+
   # Raised when an unknown protocol is used to try to send to graphite
   class ProtocolError < Exception; end
 end
