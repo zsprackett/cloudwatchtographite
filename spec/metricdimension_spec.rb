@@ -19,7 +19,7 @@ describe CloudwatchToGraphite::MetricDimension do
       d.should be_an_instance_of CloudwatchToGraphite::MetricDimension
     end
     it "should require valid arguments" do
-      expect { CloudwatchToGraphite::MetricDefinition.create_and_fill({'name' => 'blah'}) }.to raise_error(CloudwatchToGraphite::ParseError)
+      expect { CloudwatchToGraphite::MetricDimension.create_and_fill({'name' => 'blah'}) }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
     end
   end
 
