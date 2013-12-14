@@ -12,6 +12,7 @@
 # == Copyright
 # Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
 #
+require_relative './cloudwatchtographite/exception'
 require_relative './cloudwatchtographite/version'
 require_relative './cloudwatchtographite/metricdefinition'
 require_relative './cloudwatchtographite/metricdimension'
@@ -87,15 +88,15 @@ module CloudwatchToGraphite
 
     def get_datapoints(metrics)
       if metrics.kind_of?(CloudwatchToGraphite::MetricDefinition)
-        raise ArgumentError
+        raise CloudwatchToGraphite::ArgumentTypeError
       end
 
       ret = []
       metrics.each do |m|
-        debug_log "Sending:\n%s" % PP.pp(m.to_stringy_h, "")
+        debug_log "Sending:\n%s" % PP.pp(m.to_h, "")
         begin
           data_points = @cloudwatch.get_metric_statistics(
-            m.to_stringy_h
+            m.to_h
           ).body['GetMetricStatisticsResult']['Datapoints']
           debug_log "Received:\n%s" % PP.pp(data_points, "")
           data_points = order_data_points(data_points)
@@ -130,14 +131,16 @@ module CloudwatchToGraphite
           send_udp(results)
         else
           warn "Unknown protocol %s" % @protocol
-          false
+          raise CloudwatchToGraphite::ProtocolError
         end
       end
     end
 
     def carbon_prefix=(p)
-      if not p.kind_of?(String) or not p.length > 0
-        raise ArgumentError
+      if not p.kind_of?(String)
+        raise CloudwatchToGraphite::ArgumentTypeError
+      elsif p.length <= 0
+        raise CloudwatchToGraphite::ArgumentLengthError
       end
       @carbon_prefix=p
     end
@@ -163,6 +166,5 @@ module CloudwatchToGraphite
         warn s
       end
     end
-
   end
 end

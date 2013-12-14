@@ -16,7 +16,7 @@ module CloudwatchToGraphite
   class MetricDimension
     attr_reader :Name, :Value
     extend Hashifiable
-    hashify :Name, :Value
+    hashify 'Name', 'Value'
 
     def initialize(name, value)
       self.Name = name
@@ -24,15 +24,19 @@ module CloudwatchToGraphite
     end
 
     def Name=(n)
-      if not n.kind_of?(String) or n.length >= 256
-        raise ArgumentError
+      if not n.kind_of?(String)
+        raise CloudwatchToGraphite::ArgumentTypeError
+      elsif n.length >= 256
+        raise CloudwatchToGraphite::ArgumentLengthError
       end
       @Name=n
     end
 
     def Value=(n)
-      if not n.kind_of?(String) or n.length >= 256
-        raise ArgumentError
+      if not n.kind_of?(String)
+        raise CloudwatchToGraphite::ArgumentTypeError
+      elsif n.length >= 256
+        raise CloudwatchToGraphite::ArgumentLengthError
       end
       @Value=n
     end
@@ -41,7 +45,7 @@ module CloudwatchToGraphite
       if dhash.kind_of?(Hash) and dhash.has_key?('name') and dhash.has_key?('value')
         MetricDimension.new(dhash['name'], dhash['value'])
       else
-        false
+        raise CloudwatchToGraphite::ArgumentTypeError
       end
     end
   end

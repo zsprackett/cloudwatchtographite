@@ -50,11 +50,10 @@ module CloudwatchToGraphite
     end
 
     private
-    def self.load_content(contents)
+    def self.load_content(contents, strict=false)
       metrics = []
       unless contents.kind_of?(Hash) and contents.has_key?('metrics') and contents['metrics'].kind_of?(Array)
-        warn "Metrics file does not contain metrics!"
-        []
+        raise CloudwatchToGraphite::ArgumentTypeError
       else
         contents['metrics'].each do |m|
           parsed = CloudwatchToGraphite::MetricDefinition::create_and_fill m

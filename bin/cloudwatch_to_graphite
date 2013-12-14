@@ -107,10 +107,15 @@ rescue OptionParser::InvalidOption => e
 end
 
 metrics = nil
-if not options[:json_metrics].nil?
-  metrics = CloudwatchToGraphite::LoadMetrics.from_json_file(options[:json_metrics])
-else
-  metrics = CloudwatchToGraphite::LoadMetrics.from_yaml_file(options[:yaml_metrics])
+begin
+  if not options[:json_metrics].nil?
+    metrics = CloudwatchToGraphite::LoadMetrics.from_json_file(options[:json_metrics])
+  else
+    metrics = CloudwatchToGraphite::LoadMetrics.from_yaml_file(options[:yaml_metrics])
+  end
+rescue CloudwatchToGraphite::ParseError
+  warn "Failed to parse option file"
+  exit 1
 end
 
 if metrics.empty?

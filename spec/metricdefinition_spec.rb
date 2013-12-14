@@ -13,34 +13,55 @@ describe CloudwatchToGraphite::MetricDefinition do
         { 'name' => 'fooname2', 'value' => 'foovalue2' },
       ]
     })
+
+    @valid_string = 'a' * 255
+    @invalid_string = 'z' * 256
   end
 
-  describe "#create_and_fill" do
+  describe ".create_and_fill" do
     it "should be a MetricDefinition" do
       @definition.should be_an_instance_of CloudwatchToGraphite::MetricDefinition
     end
   end
 
-  describe "#new" do
+  describe ".new" do
     it "takes no parameters and returns a MetricDefinition" do
       d = CloudwatchToGraphite::MetricDefinition.new
       d.should be_an_instance_of CloudwatchToGraphite::MetricDefinition
     end
   end
 
-  describe "#Namespace" do
+  describe ".Namespace" do
     it "returns the correct namespace" do
       @definition.Namespace.should eql 'foonamespace'
     end
   end
 
-  describe "#MetricName" do
+  describe ".Namespace=" do
+    it "only accepts valid arguments" do
+      expect { @definition.Namespace = 123 }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      expect { @definition.Namespace = @invalid_string }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
+      @definition.Namespace = @valid_string
+      @definition.Namespace.should eql @valid_string
+    end
+  end
+
+  describe ".MetricName" do
     it "returns the correct metricname" do
       @definition.MetricName.should eql 'foometricname'
     end
   end
 
-  describe "#Statistics" do
+  describe ".MetricName=" do
+    it "only accepts valid arguments" do
+      expect { @definition.MetricName = 123 }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      expect { @definition.MetricName = @invalid_string }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
+      @definition.MetricName = @valid_string
+      @definition.MetricName.should eql @valid_string
+    end
+  end
+
+  describe ".Statistics" do
     it "returns the correct statistics" do
       statistics = @definition.Statistics
       statistics.should be_an Array
@@ -50,13 +71,27 @@ describe CloudwatchToGraphite::MetricDefinition do
     end
   end
 
-  describe "#Period" do
+  describe ".add_statistic=" do
+    it "only accepts valid arguments" do
+      expect { @definition.add_statistic('NotValid') }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+    end
+  end
+
+  describe ".Period" do
     it "returns the correct period" do
       @definition.Period.should eql 90
     end
   end
 
-  describe "#Dimensions" do
+  describe ".Period=" do
+    it "only accepts valid arguments" do
+      expect { @definition.Period = 'abc' }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      @definition.Period = 1
+      @definition.Period.should eql 1
+    end
+  end
+
+  describe ".Dimensions" do
     it "returns the correct dimensions" do
       dimensions = @definition.Dimensions
       dimensions.should be_an Array
@@ -69,7 +104,7 @@ describe CloudwatchToGraphite::MetricDefinition do
     end
   end
 
-  describe "#Unit" do
+  describe ".Unit" do
     it "returns the correct unit" do
       @definition.Unit.should eql 'Bits'
     end

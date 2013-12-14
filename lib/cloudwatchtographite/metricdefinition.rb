@@ -63,7 +63,7 @@ module CloudwatchToGraphite
   class MetricDefinition
     attr_reader :Namespace, :MetricName, :Statistics, :Unit, :Period
     extend Hashifiable
-    hashify :Namespace, :MetricName, :Statistics, :StartTime, :EndTime, :Period, :Dimensions#, :Unit
+    hashify 'Namespace', 'MetricName', 'Statistics', 'StartTime', 'EndTime', 'Period', 'Dimensions'#, 'Unit'
 
     def initialize
       @Unit = UNITS[0]
@@ -73,21 +73,25 @@ module CloudwatchToGraphite
     end
 
     def Namespace=(n)
-      if not n.kind_of?(String) or n.length >= 256
-        raise ArgumentError
+      if not n.kind_of?(String)
+        raise CloudwatchToGraphite::ArgumentTypeError
+      elsif n.length >= 256
+        raise CloudwatchToGraphite::ArgumentLengthError
       end
       @Namespace=n
     end
 
     def MetricName=(n)
-      if not n.kind_of?(String) or n.length >= 256
-        raise ArgumentError
+      if not n.kind_of?(String)
+        raise CloudwatchToGraphite::ArgumentTypeError
+      elsif n.length >= 256
+        raise CloudwatchToGraphite::ArgumentLengthError
       end
       @MetricName=n
     end
 
     def StartTime=(time)
-      raise ArgumentError unless time.kind_of?(Time)
+      raise CloudwatchToGraphite::ArgumentTypeError unless time.kind_of?(Time)
       @StartTime=time
     end
 
@@ -100,7 +104,7 @@ module CloudwatchToGraphite
     end
 
     def EndTime=(time)
-      raise ArgumentError unless time.kind_of?(Time)
+      raise CloudwatchToGraphite::ArgumentTypeError unless time.kind_of?(Time)
       @EndTime=time
     end
 
@@ -113,28 +117,32 @@ module CloudwatchToGraphite
     end
 
     def Period=(n)
-      raise ArgumentError unless n.kind_of? Integer
+      raise CloudwatchToGraphite::ArgumentTypeError unless n.kind_of? Integer
       @Period = n
     end
 
     def Unit=(n)
-      raise ArgumentError unless UNITS.include? n
+      raise CloudwatchToGraphite::ArgumentTypeError unless UNITS.include? n
       @Unit = n
     end
 
     def Dimensions
-      @Dimensions.map(&:to_stringy_h)
+      @Dimensions.map(&:to_h)
     end
 
     def add_statistic(n)
-      raise ArgumentError unless STATISTICS.include? n
+      raise CloudwatchToGraphite::ArgumentTypeError unless STATISTICS.include? n
       if not @Statistics.include? n
         @Statistics.push(n)
       end
     end
 
     def add_dimension(n)
-      raise ArgumentError unless n.kind_of?(MetricDimension) and @Dimensions.length < 10
+      if not n.kind_of?(MetricDimension)
+        raise CloudwatchToGraphite::ArgumentTypeError
+      elsif @Dimensions.length >= 10
+        raise CloudwatchToGraphite::TooManyDimensionError
+      end
       @Dimensions.push(n)
     end
 
@@ -147,10 +155,7 @@ module CloudwatchToGraphite
     end
 
     def graphite_path(stat)
-     path = "%s.%s.%s" % [self.Namespace, self.MetricName, stat]
-     @Dimensions.each do |d|
-       path += "." + d.Value
-     end
+     path = "%s.%s.%s.%s" % [self.Namespace, self.MetricName, stat, @Dimensions.join('.')]
      path.gsub('/', '.').downcase
     end
 
@@ -163,8 +168,8 @@ module CloudwatchToGraphite
         when 'starttime', 'endtime'
           begin
             md.send(SETTER_MAPPINGS[k], Time.parse(definition[k]))
-          rescue ArgumentError
-            warn "Ignoring malformed #{k} of #{definition[k]}"
+          rescue CloudwatchToGraphite::ArgumentTypeError
+            raise CloudwatchToGraphite::ParseError
           end
         when 'statistics'
           Array(definition[k]).each do |stat|
@@ -175,11 +180,13 @@ module CloudwatchToGraphite
             md.add_dimension(MetricDimension.create_and_fill(dimension))
           end
         else
-          warn "Ignoring unknown metric definition #{k}"
+          raise CloudwatchToGraphite::ParseError
         end
       end
-
-      md.valid? ? md : false
+      if not md.valid?
+        raise CloudwatchToGraphite::ParseError
+      end
+      return md
     end
   end
 end

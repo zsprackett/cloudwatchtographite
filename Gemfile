@@ -5,7 +5,7 @@ gem 'bundler'
 gem 'unf'
 gem 'fog', :git => 'https://github.com/fog/fog.git' # need newer fog than release gem 1.18.0
 gem 'excon'
-gem 'hashifiable', :git => 'https://github.com/zsprackett/hashifiable.git', :branch => 'to_stringy_h'
+gem 'hashifiable'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
