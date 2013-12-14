@@ -4,8 +4,9 @@ source 'http://rubygems.org'
 gem 'bundler'
 gem 'unf'
 gem 'fog', :git => 'https://github.com/fog/fog.git' # need newer fog than release gem 1.18.0
-gem 'excon'
-gem 'hashifiable'
+# this can go away when fog is released
+gem 'excon', '>= 0.1.30'
+gem 'hashifiable', '>= 0.1.3'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
