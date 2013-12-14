@@ -65,8 +65,8 @@ module CloudwatchToGraphite
   class MetricDefinition
     attr_reader :Namespace, :MetricName, :Statistics, :Unit, :Period
     extend Hashifiable
-    hashify 'Namespace', 'MetricName', 'Statistics', 'StartTime'
-    hashify 'EndTime', 'Period', 'Dimensions'#, 'Unit'
+    hashify 'Namespace', 'MetricName', 'Statistics', 'StartTime', \
+      'EndTime', 'Period', 'Dimensions'#, 'Unit'
 
     def initialize
       @Unit = UNITS[0]

@@ -108,16 +108,15 @@ module CloudwatchToGraphite
     end
 
     def retrieve_one_datapoint(metric)
-      debug_log "Sending:\n%s" % PP.pp(m.to_h, "")
-      ret = []
-        data_points = @cloudwatch.get_metric_statistics(
-          metric.to_h
-        ).body['GetMetricStatisticsResult']['Datapoints']
-        debug_log "Received:\n%s" % PP.pp(data_points, "")
+      debug_log "Sending to CloudWatch:"
+      debug_object metric.to_h
+      data_points = @cloudwatch.get_metric_statistics(
+        metric.to_h
+      ).body['GetMetricStatisticsResult']['Datapoints']
+      debug_log "Received from CloudWatch:"
+      debug_object data_points
 
-        ret.concat retrieve_statistics(metric, order_data_points(data_points))
-        debug_log "Returning:\n%s" % PP.pp(ret, "")
-        return ret
+      return retrieve_statistics(metric, order_data_points(data_points))
     end
 
     def retrieve_statistics(metric, data_points)
@@ -128,6 +127,8 @@ module CloudwatchToGraphite
           ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
         end
       end
+      debug_log "Returning Statistics:"
+      debug_object ret
       ret
     end
 
@@ -174,6 +175,12 @@ module CloudwatchToGraphite
     def debug_log(s)
       if @verbose
         warn s
+      end
+    end
+
+    def debug_object(s)
+      if @verbose
+        warn PP.pp(s, "")
       end
     end
   end
