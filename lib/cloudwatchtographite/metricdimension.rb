@@ -25,12 +25,12 @@ module CloudwatchToGraphite
     end
 
     def Name=(n)
-      CloudwatchToGraphite::Validator::string_length(n, 256)
+      CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
       @Name=n
     end
 
     def Value=(n)
-      CloudwatchToGraphite::Validator::string_length(n, 256)
+      CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
       @Value=n
     end
 

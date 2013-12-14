@@ -76,12 +76,12 @@ module CloudwatchToGraphite
     end
 
     def Namespace=(n)
-      CloudwatchToGraphite::Validator::string_length(n, 256)
+      CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
       @Namespace=n
     end
 
     def MetricName=(n)
-      CloudwatchToGraphite::Validator::string_length(n, 256)
+      CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
       @MetricName=n
     end
 
