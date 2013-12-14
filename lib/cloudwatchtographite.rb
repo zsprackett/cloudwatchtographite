@@ -1,16 +1,8 @@
 # _*_ coding: utf-8 _*_
-# == Synopsis
-# CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
-# and passes them on to a graphite server
 #
-# == Author
-# S. Zachariah Sprackett <zac@sprackett.com>
-#
-# == License
-# The MIT License (MIT)
-#
-# == Copyright
-# Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
+# Author:: S. Zachariah Sprackett <zac@sprackett.com>
+# License:: The MIT License (MIT)
+# Copyright:: Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
 #
 require_relative './cloudwatchtographite/exception'
 require_relative './cloudwatchtographite/version'
@@ -23,12 +15,20 @@ require 'fog'
 require 'pp'
 
 module CloudwatchToGraphite
+  # This class is responsible for retrieving metrics from CloudWatch and
+  # sending the results to a Graphite server.
   class Base
     attr_accessor :protocol
     attr_accessor :graphite_server
     attr_accessor :graphite_port
     attr_reader   :carbon_prefix
 
+    # Initialize the CloudwatchToGraphite::Base object.
+    # aws_access_key:: The AWS user key
+    # aws_secret_key:: The AWS secret
+    # region:: The AWS region (eg: us-west-1)
+    # verbose:: boolean to enable verbose output
+    #
     def initialize(aws_access_key, aws_secret_key, region, verbose=false)
       @protocol        = 'udp'
       @carbon_prefix   = 'cloudwatch'
@@ -45,6 +45,9 @@ module CloudwatchToGraphite
       )
     end
 
+    # Send data to a Graphite server via the UDP protocol
+    # contents:: a string or array containing the contents to send
+    #
     def send_udp(contents)
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
@@ -66,6 +69,9 @@ module CloudwatchToGraphite
       retval
     end
 
+    # Send data to a Graphite server via the TCP protocol
+    # contents:: a string or array containing the contents to send
+    #
     def send_tcp(contents)
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
@@ -87,41 +93,46 @@ module CloudwatchToGraphite
       retval
     end
 
-    def get_datapoints(metrics)
-      if metrics.kind_of?(CloudwatchToGraphite::MetricDefinition)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      end
-
+    def retrieve_datapoints(metrics)
       ret = []
-      metrics.each do |m|
-        debug_log "Sending:\n%s" % PP.pp(m.to_h, "")
+      Array(metrics).each do |m|
         begin
-          data_points = @cloudwatch.get_metric_statistics(
-            m.to_h
-          ).body['GetMetricStatisticsResult']['Datapoints']
-          debug_log "Received:\n%s" % PP.pp(data_points, "")
-          data_points = order_data_points(data_points)
-
-          m.Statistics.each do |stat|
-            name = "%s.%s" % [ @carbon_prefix,  m.graphite_path(stat) ]
-
-            data_points.each do |d|
-              ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
-            end
-          end
+          ret.concat retrieve_one_datapoint(m)
         rescue Excon::Errors::SocketError, Excon::Errors::BadRequest => e
           warn "[Error in CloudWatch call] %s" % e.message
         rescue Excon::Errors::Forbidden
           warn "[Error in CloudWatch call] permission denied - check keys!"
         end
       end
+      ret
+    end
 
-      debug_log "Returning:\n%s" % PP.pp(ret, "")
+    def retrieve_one_datapoint(metric)
+      debug_log "Sending:\n%s" % PP.pp(m.to_h, "")
+      ret = []
+        data_points = @cloudwatch.get_metric_statistics(
+          metric.to_h
+        ).body['GetMetricStatisticsResult']['Datapoints']
+        debug_log "Received:\n%s" % PP.pp(data_points, "")
+
+        ret.concat retrieve_statistics(metric, order_data_points(data_points))
+        debug_log "Returning:\n%s" % PP.pp(ret, "")
+        return ret
+    end
+
+    def retrieve_statistics(metric, data_points)
+      ret = []
+      metric.Statistics.each do |stat|
+        name = "%s.%s" % [ @carbon_prefix,  metric.graphite_path(stat) ]
+        data_points.each do |d|
+          ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
+        end
+      end
       ret
     end
 
     def fetch_and_forward(metrics)
-      results = get_datapoints(metrics)
+      results = retrieve_datapoints(metrics)
       if results.length == 0
         false
       else
@@ -131,18 +142,16 @@ module CloudwatchToGraphite
         when 'udp'
           send_udp(results)
         else
-          warn "Unknown protocol %s" % @protocol
+          debug_log "Unknown protocol %s" % @protocol
           raise CloudwatchToGraphite::ProtocolError
         end
       end
     end
 
+    # set the carbon prefix
+    # p:: the string prefix to use
     def carbon_prefix=(p)
-      if not p.kind_of?(String)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      elsif p.length <= 0
-        raise CloudwatchToGraphite::ArgumentLengthError
-      end
+      CloudwatchToGraphite::Validator::string_longer_than(p, 0)
       @carbon_prefix=p
     end
 

@@ -16,6 +16,9 @@ require 'json'
 require 'yaml'
 
 module CloudwatchToGraphite
+  # Load metrics from a file and parse them into a
+  # CloudwatchToGraphite::MetricDefinition object
+  #
   class LoadMetrics
     def self.from_json_file(filename)
       if not File.readable?(filename)
@@ -52,8 +55,10 @@ module CloudwatchToGraphite
     private
     def self.load_content(contents, strict=false)
       metrics = []
-      unless contents.kind_of?(Hash) and contents.has_key?('metrics') and contents['metrics'].kind_of?(Array)
-        raise CloudwatchToGraphite::ArgumentTypeError
+      unless contents.kind_of?(Hash) \
+        and contents.has_key?('metrics') \
+        and contents['metrics'].kind_of?(Array)
+          raise CloudwatchToGraphite::ArgumentTypeError
       else
         contents['metrics'].each do |m|
           parsed = CloudwatchToGraphite::MetricDefinition::create_and_fill m

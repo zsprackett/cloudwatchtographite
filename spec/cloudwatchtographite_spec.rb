@@ -16,10 +16,12 @@ describe CloudwatchToGraphite::Base do
 
   describe ".carbon_prefix=" do
     it "allows setting a prefix for carbon" do
-      expect { @base.carbon_prefix = 123 }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
-      expect { @base.carbon_prefix = '' }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
+      expect { @base.carbon_prefix = 123 }.to \
+        raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      expect { @base.carbon_prefix = '' }.to \
+        raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @base.carbon_prefix = "the_prefix"
-      @base.carbon_prefix.should eql "the_prefix" 
+      @base.carbon_prefix.should eql "the_prefix"
     end
   end
 

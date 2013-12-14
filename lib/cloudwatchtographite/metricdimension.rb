@@ -13,6 +13,7 @@
 # Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
 #
 module CloudwatchToGraphite
+  # A hashable representation of an AWS CloudWatch metric dimension
   class MetricDimension
     attr_reader :Name, :Value
     extend Hashifiable
@@ -34,8 +35,9 @@ module CloudwatchToGraphite
     end
 
     def self.create_and_fill(dhash)
-      if dhash.kind_of?(Hash) and dhash.has_key?('name') and dhash.has_key?('value')
-        MetricDimension.new(dhash['name'], dhash['value'])
+      if dhash.kind_of?(Hash) and dhash.has_key?('name') \
+        and dhash.has_key?('value')
+          MetricDimension.new(dhash['name'], dhash['value'])
       else
         raise CloudwatchToGraphite::ArgumentTypeError
       end

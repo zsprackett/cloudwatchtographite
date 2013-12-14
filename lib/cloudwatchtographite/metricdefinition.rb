@@ -60,10 +60,13 @@ module CloudwatchToGraphite
     'unit'       => :Unit=
   }
 
+  # A hashable representation of an AWS CloudWatch metric
+  #
   class MetricDefinition
     attr_reader :Namespace, :MetricName, :Statistics, :Unit, :Period
     extend Hashifiable
-    hashify 'Namespace', 'MetricName', 'Statistics', 'StartTime', 'EndTime', 'Period', 'Dimensions'#, 'Unit'
+    hashify 'Namespace', 'MetricName', 'Statistics', 'StartTime'
+    hashify 'EndTime', 'Period', 'Dimensions'#, 'Unit'
 
     def initialize
       @Unit = UNITS[0]
@@ -139,46 +142,66 @@ module CloudwatchToGraphite
     end
 
     def valid?
-      if @Namespace.nil? or @MetricName.nil? or @Statistics.empty? or @Dimensions.empty? or @Unit.nil?
-        false
+      if @Namespace.nil? or @MetricName.nil? or @Statistics.empty? \
+        or @Dimensions.empty? or @Unit.nil?
+          false
       else
         true
       end
     end
 
     def graphite_path(stat)
-     path = "%s.%s.%s.%s" % [self.Namespace, self.MetricName, stat, @Dimensions.join('.')]
+     path = "%s.%s.%s.%s" % [
+       self.Namespace,
+       self.MetricName,
+       stat,
+       @Dimensions.join('.')
+     ]
      path.gsub('/', '.').downcase
     end
 
     def self.create_and_fill(definition)
       md = MetricDefinition.new
       definition.each_key do |k|
-        case k
-        when 'namespace', 'metricname', 'period', 'unit'
-          md.send(SETTER_MAPPINGS[k], definition[k])
-        when 'starttime', 'endtime'
-          begin
-            md.send(SETTER_MAPPINGS[k], Time.parse(definition[k]))
-          rescue CloudwatchToGraphite::ArgumentTypeError
-            raise CloudwatchToGraphite::ParseError
-          end
-        when 'statistics'
-          Array(definition[k]).each do |stat|
-            md.add_statistic(stat)
-          end
-        when 'dimensions'
-          Array(definition[k]).each do |dimension|
-            md.add_dimension(MetricDimension.create_and_fill(dimension))
-          end
-        else
-          raise CloudwatchToGraphite::ParseError
-        end
+        self::populate_metric_definition(
+          md, k, definition[k]
+        )
       end
       if not md.valid?
         raise CloudwatchToGraphite::ParseError
       end
       return md
+    end
+
+    def self.populate_metric_definition(md, key, value)
+      case key
+      when 'namespace', 'metricname', 'period', 'unit'
+        md.send(SETTER_MAPPINGS[key], value)
+      when 'starttime', 'endtime'
+        begin
+          md.send(SETTER_MAPPINGS[key], Time.parse(value))
+        rescue CloudwatchToGraphite::ArgumentTypeError
+          raise CloudwatchToGraphite::ParseError
+        end
+      when 'statistics'
+        self::populate_statistics(md, value)
+      when 'dimensions'
+        self::populate_dimensions(md, value)
+      else
+        raise CloudwatchToGraphite::ParseError
+      end
+    end
+
+    def self.populate_statistics(md, statistics)
+      Array(statistics).each do |stat|
+        md.add_statistic(stat)
+      end
+    end
+
+    def self.populate_dimensions(md, dimensions)
+      Array(dimensions).each do |dimension|
+        md.add_dimension(MetricDimension.create_and_fill(dimension))
+      end
     end
   end
 end

@@ -33,15 +33,17 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
 end
 
-RSpec::Core::RakeTask.new(:rcov) do |spec|
-  spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
-end
-
 require 'cucumber/rake/task'
 Cucumber::Rake::Task.new(:features)
 
-task :default => :spec
+require 'cane/rake_task'
+Cane::RakeTask.new(:quality) do |cane|
+  cane.abc_max = 10
+  cane.add_threshold 'coverage/.last_run.json', :>=, 70
+end
+
+task :test => [:spec, :quality]
+task :default => :test
 
 require 'rdoc/task'
 require './lib/cloudwatchtographite/version.rb'

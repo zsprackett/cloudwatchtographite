@@ -15,6 +15,7 @@ group :development do
   gem 'rspec'
   gem 'cucumber'
   gem 'jeweler'
+  gem 'cane'
 end
 
 group :test do
