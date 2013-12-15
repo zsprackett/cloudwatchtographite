@@ -19,11 +19,6 @@ module CloudwatchToGraphite
     extend Hashifiable
     hashify 'Name', 'Value'
 
-    def initialize(name, value)
-      self.Name = name
-      self.Value = value
-    end
-
     def Name=(n)
       CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
       @Name=n
@@ -34,10 +29,20 @@ module CloudwatchToGraphite
       @Value=n
     end
 
-    def self.create_and_fill(dhash)
+    def self.create(name, value)
+      md = MetricDimension.new
+      md.Name = name
+      md.Value = value
+      md
+    end
+
+    def self.create_from_hash(dhash)
       if dhash.kind_of?(Hash) and dhash.has_key?('name') \
         and dhash.has_key?('value')
-          MetricDimension.new(dhash['name'], dhash['value'])
+          CloudwatchToGraphite::MetricDimension::create(
+            dhash['name'],
+            dhash['value']
+          )
       else
         raise CloudwatchToGraphite::ArgumentTypeError
       end

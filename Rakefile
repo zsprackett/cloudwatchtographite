@@ -33,9 +33,6 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.pattern = FileList['spec/**/*_spec.rb']
 end
 
-require 'cucumber/rake/task'
-Cucumber::Rake::Task.new(:features)
-
 require 'cane/rake_task'
 Cane::RakeTask.new(:quality) do |cane|
   cane.abc_max = 10

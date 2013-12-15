@@ -2,17 +2,12 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe CloudwatchToGraphite::MetricDefinition do
   before :each do
-    @definition = CloudwatchToGraphite::MetricDefinition.create_and_fill({
-      'namespace'  => 'foonamespace',
-      'metricname' => 'foometricname',
-      'period'     => 90,
-      'unit'       => 'Bits',
-      'statistics' => ['Sum', 'Average'],
-      'dimensions' => [
-        { 'name' => 'fooname1', 'value' => 'foovalue1' },
-        { 'name' => 'fooname2', 'value' => 'foovalue2' },
-      ]
-    })
+    @definition = FactoryGirl.build(
+      :metricdefinition,
+      MetricName: 'foometricname',
+      Namespace:  'foonamespace',
+      Unit:       'Bits'
+    )
 
     @valid_string = 'a' * 255
     @invalid_string = 'z' * 256
@@ -87,11 +82,23 @@ describe CloudwatchToGraphite::MetricDefinition do
     end
   end
 
-  describe ".add_statistic=" do
+  describe ".add_statistic" do
     it "only accepts valid arguments" do
       expect {
         @definition.add_statistic('NotValid')
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+    end
+  end
+
+  describe ".add_dimension" do
+    it "accepts ten dimensions and no more" do
+      dimensions = FactoryGirl.build_list(:metricdimension, 10)
+      dimensions.each do |d|
+        @definition.add_dimension(d)
+      end
+      expect {
+          @definition.add_dimension(FactoryGirl.build(:metricdimension))
+      }.to raise_error(CloudwatchToGraphite::TooManyDimensionError)
     end
   end
 
@@ -113,6 +120,10 @@ describe CloudwatchToGraphite::MetricDefinition do
 
   describe ".Dimensions" do
     it "returns the correct dimensions" do
+      dimensions = FactoryGirl.build_list(:metricdimension, 2)
+      dimensions.each do |d|
+        @definition.add_dimension(d)
+      end
       dimensions = @definition.Dimensions
       dimensions.should be_an Array
       dimensions.should have(2).items

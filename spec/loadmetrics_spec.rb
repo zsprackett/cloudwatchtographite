@@ -10,18 +10,18 @@ describe CloudwatchToGraphite::LoadMetrics do
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
     end
 
-    it "it should load valid metrics" do
-      content = {
-        'metrics'    => [ {
-          'namespace'  => 'thenamespace',
-          'metricname' => 'themetricname',
-          'statistics' => 'Average',
-          'period'     => 1,
-          'dimensions' => [ { 'name' => 'thename', 'value' => 'thevalue' }]
-        }]
-      }
-      metrics = CloudwatchToGraphite::LoadMetrics::load_content(content)
-      metrics.should be_an(Array)
-    end
+    #it "it should load valid metrics" do
+    #  content = {
+    #    'metrics'    => [ {
+    #      'namespace'  => 'thenamespace',
+    #      'metricname' => 'themetricname',
+    #      'statistics' => 'Average',
+    #      'period'     => 1,
+    #      'dimensions' => [ { 'name' => 'thename', 'value' => 'thevalue' }]
+    #    }]
+    #  }
+    #  metrics = CloudwatchToGraphite::LoadMetrics::load_content(content)
+    #  metrics.should be_an(Array)
+    #end
   end
 end

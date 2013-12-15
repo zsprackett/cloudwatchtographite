@@ -24,8 +24,5 @@ describe CloudwatchToGraphite::Base do
       @base.carbon_prefix.should eql "the_prefix"
     end
   end
-
-  describe ".debug_log" do
-  end
 end
 

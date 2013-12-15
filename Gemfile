@@ -4,8 +4,6 @@ source 'http://rubygems.org'
 gem 'bundler'
 gem 'unf'
 gem 'fog', :git => 'https://github.com/fog/fog.git' # need newer fog than release gem 1.18.0
-# this can go away when fog is released
-gem 'excon', '>= 0.1.30'
 gem 'hashifiable', '>= 0.1.3'
 
 # Add dependencies to develop your gem here.
@@ -13,13 +11,15 @@ gem 'hashifiable', '>= 0.1.3'
 group :development do
   gem 'rdoc'
   gem 'rspec'
-  gem 'cucumber'
+  gem 'rspec-mocks'
   gem 'jeweler'
   gem 'cane'
+  gem "factory_girl"
 end
 
 group :test do
   gem 'rspec'
-  gem 'cucumber'
+  gem 'rspec-mocks'
+  gem "factory_girl"
   gem 'coveralls', require: false
 end

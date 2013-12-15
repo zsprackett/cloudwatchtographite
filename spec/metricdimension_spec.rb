@@ -2,8 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe CloudwatchToGraphite::MetricDimension do
   before :each do
-    @dimension = CloudwatchToGraphite::MetricDimension.new(
-      'testname', 'testval'
+    @dimension = FactoryGirl.build(
+      :metricdimension,
+      Name: 'testname',
+      Value: 'testval'
     )
     @valid_string = 'a' * 255
     @invalid_string = 'z' * 256
@@ -16,16 +18,16 @@ describe CloudwatchToGraphite::MetricDimension do
     end
   end
 
-  describe ".create_and_fill" do
+  describe ".create_from_hash" do
     it "should return a MetricDimension" do
-      d = CloudwatchToGraphite::MetricDimension.create_and_fill(
+      d = CloudwatchToGraphite::MetricDimension.create_from_hash(
         {'name' => 'a', 'value' => 'b'}
       )
       d.should be_an_instance_of CloudwatchToGraphite::MetricDimension
     end
     it "should require valid arguments" do
       expect {
-        CloudwatchToGraphite::MetricDimension.create_and_fill(
+        CloudwatchToGraphite::MetricDimension.create_from_hash(
           {'name' => 'blah'}
         )
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)

@@ -200,7 +200,7 @@ module CloudwatchToGraphite
 
     def self.populate_dimensions(md, dimensions)
       Array(dimensions).each do |dimension|
-        md.add_dimension(MetricDimension.create_and_fill(dimension))
+        md.add_dimension(MetricDimension.create_from_hash(dimension))
       end
     end
   end
