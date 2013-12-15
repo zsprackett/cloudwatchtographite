@@ -88,7 +88,47 @@ YAML Metrics Definition File
           name: InstanceId
           value: i-abc123456
 
+Contributing
+------------
+
+* Find something you would like to work on.
+  * Look for anything you can help with in the [issue tracker](https://github.com/zsprackett/cloudwatchtographite/issues).
+  * Look at the [code quality metrics](https://codeclimate.com/github/zsprackett/cloudwatchtographite) for anything you can help clean up.
+  * Look at the [test coverage](https://coveralls.io/r/zsprackett/cloudwatchtographite) for code in need of rspec tests.
+  * Do something else cool!
+* Fork the project and do your work in a topic branch.
+  * Make sure your changes will work on both Ruby 1.9.3 and Ruby 2.0
+* Add tests to prove your code works and run all the tests using `bundle exec rake`.
+* Rebase your branch against `zsprackett/cloudwatchtographite` to make sure everything is up to date.
+* Commit your changes and send a pull request.
+
 Author
 ------
 
 [S. Zachariah Sprackett](mailto:zac@sprackett.com)
+
+Copyright
+---------
+
+(The MIT License)
+
+Copyright (c) 2013 [zsprackett (S. Zachariah Sprackett)](http://github.com/zsprackett)
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
