@@ -6,11 +6,11 @@ library to connect to the Amazon APIs.  It can parse a list of metric
 definitions in either JSON or YAML formats.  It will take the results and
 submit them to a Graphite server of your choosing.
 
-- [![Gem Version](https://badge.fury.io/rb/cloudwatchtographite.png)](http://badge.fury.io/rb/cloudwatchtographite)
 - [Fog](https://github.com/fog/fog)
 - [Graphite](http://graphite.wikidot.com/)
 - [AWS CloudWatch](http://aws.amazon.com/cloudwatch/)
 
+[![Gem Version](https://badge.fury.io/rb/cloudwatchtographite.png)](http://badge.fury.io/rb/cloudwatchtographite)
 [![Build Status](https://travis-ci.org/zsprackett/cloudwatchtographite.png?branch=master)](https://travis-ci.org/zsprackett/cloudwatchtographite)
 [![Code Climate](https://codeclimate.com/github/zsprackett/cloudwatchtographite.png)](https://codeclimate.com/github/zsprackett/cloudwatchtographite)
 [![Coverage Status](https://coveralls.io/repos/zsprackett/cloudwatchtographite/badge.png)](https://coveralls.io/r/zsprackett/cloudwatchtographite)
