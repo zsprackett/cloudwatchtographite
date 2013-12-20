@@ -186,7 +186,7 @@ module CloudwatchToGraphite
       when 'statistics'
         self::populate_statistics(md, value)
       when 'dimensions'
-        self::populate_dimensions(md, value)
+        self::populate_dimensions_from_hashes(md, value)
       else
         raise CloudwatchToGraphite::ParseError
       end
@@ -198,7 +198,7 @@ module CloudwatchToGraphite
       end
     end
 
-    def self.populate_dimensions(md, dimensions)
+    def self.populate_dimensions_from_hashes(md, dimensions)
       Array(dimensions).each do |dimension|
         md.add_dimension(MetricDimension.create_from_hash(dimension))
       end

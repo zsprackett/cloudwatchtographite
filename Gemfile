@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 # Required gems
 gem 'bundler'
 gem 'unf'
-gem 'fog', :git => 'https://github.com/fog/fog.git' # need newer fog than release gem 1.18.0
+gem "fog", "~> 1.19.0"
 gem 'hashifiable', '>= 0.1.3'
 
 # Add dependencies to develop your gem here.
