@@ -76,17 +76,17 @@ module CloudwatchToGraphite
     end
 
     def Namespace=(n)
-      CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
+      Validator::string_shorter_than(n, 256)
       @Namespace=n
     end
 
     def MetricName=(n)
-      CloudwatchToGraphite::Validator::string_shorter_than(n, 256)
+      Validator::string_shorter_than(n, 256)
       @MetricName=n
     end
 
     def StartTime=(time)
-      raise CloudwatchToGraphite::ArgumentTypeError unless time.kind_of?(Time)
+      raise ArgumentTypeError unless time.kind_of?(Time)
       @StartTime=time
     end
 
@@ -99,7 +99,7 @@ module CloudwatchToGraphite
     end
 
     def EndTime=(time)
-      raise CloudwatchToGraphite::ArgumentTypeError unless time.kind_of?(Time)
+      raise ArgumentTypeError unless time.kind_of?(Time)
       @EndTime=time
     end
 
@@ -112,12 +112,12 @@ module CloudwatchToGraphite
     end
 
     def Period=(n)
-      raise CloudwatchToGraphite::ArgumentTypeError unless n.kind_of? Integer
+      raise ArgumentTypeError unless n.kind_of? Integer
       @Period = n
     end
 
     def Unit=(n)
-      raise CloudwatchToGraphite::ArgumentTypeError unless UNITS.include? n
+      raise ArgumentTypeError unless UNITS.include? n
       @Unit = n
     end
 
@@ -126,7 +126,7 @@ module CloudwatchToGraphite
     end
 
     def add_statistic(n)
-      raise CloudwatchToGraphite::ArgumentTypeError unless STATISTICS.include? n
+      raise ArgumentTypeError unless STATISTICS.include? n
       if not @Statistics.include? n
         @Statistics.push(n)
       end
@@ -134,9 +134,9 @@ module CloudwatchToGraphite
 
     def add_dimension(n)
       if not n.kind_of?(MetricDimension)
-        raise CloudwatchToGraphite::ArgumentTypeError
+        raise ArgumentTypeError
       elsif @Dimensions.length >= 10
-        raise CloudwatchToGraphite::TooManyDimensionError
+        raise TooManyDimensionError
       end
       @Dimensions.push(n)
     end
@@ -163,13 +163,11 @@ module CloudwatchToGraphite
     def self.create_and_fill(definition)
       md = MetricDefinition.new
       definition.each_key do |k|
-        self::populate_metric_definition(
+        populate_metric_definition(
           md, k, definition[k]
         )
       end
-      if not md.valid?
-        raise CloudwatchToGraphite::ParseError
-      end
+      raise ParseError unless md.valid?
       return md
     end
 
@@ -180,15 +178,15 @@ module CloudwatchToGraphite
       when 'starttime', 'endtime'
         begin
           md.send(SETTER_MAPPINGS[key], Time.parse(value))
-        rescue CloudwatchToGraphite::ArgumentTypeError
-          raise CloudwatchToGraphite::ParseError
+        rescue ArgumentTypeError
+          raise ParseError
         end
       when 'statistics'
-        self::populate_statistics(md, value)
+        populate_statistics(md, value)
       when 'dimensions'
-        self::populate_dimensions_from_hashes(md, value)
+        populate_dimensions_from_hashes(md, value)
       else
-        raise CloudwatchToGraphite::ParseError
+        raise ParseError
       end
     end
 

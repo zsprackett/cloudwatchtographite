@@ -36,7 +36,7 @@ module CloudwatchToGraphite
       @graphite_port   = 2003
       @verbose         = verbose
 
-      debug_log "Fog setting up for region %s" % region
+      debug_log "Fog setting up for region #{region}"
 
       @cloudwatch = Fog::AWS::CloudWatch.new(
         :aws_access_key_id => aws_access_key,
@@ -52,9 +52,8 @@ module CloudwatchToGraphite
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
 
-      debug_log "Attempting to send %d bytes to %s:%d via udp" % [
-        contents.length, @graphite_server, @graphite_port
-      ]
+      debug_log "Attempting to send #{contents.length}  bytes " +
+        "to #{@graphite_server}:#{@graphite_port} via udp"
 
       begin
         sock = UDPSocket.open
@@ -76,9 +75,8 @@ module CloudwatchToGraphite
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
 
-      debug_log "Attempting to send %d bytes to %s:%d via tcp" % [
-        contents.length, @graphite_server, @graphite_port
-      ]
+      debug_log "Attempting to send #{contents.length}  bytes " +
+        "to #{@graphite_server}:#{@graphite_port} via tcp"
 
       retval = false
       begin
@@ -99,7 +97,7 @@ module CloudwatchToGraphite
         begin
           ret.concat retrieve_one_datapoint(m)
         rescue Excon::Errors::SocketError, Excon::Errors::BadRequest => e
-          warn "[Error in CloudWatch call] %s" % e.message
+          warn "[Error in CloudWatch call] #{e.message}"
         rescue Excon::Errors::Forbidden
           warn "[Error in CloudWatch call] permission denied - check keys!"
         end
@@ -122,9 +120,9 @@ module CloudwatchToGraphite
     def retrieve_statistics(metric, data_points)
       ret = []
       metric.Statistics.each do |stat|
-        name = "%s.%s" % [ @carbon_prefix,  metric.graphite_path(stat) ]
+        name = "#{@carbon_prefix}.#{metric.graphite_path(stat)}"
         data_points.each do |d|
-          ret.push "%s %s %d" % [ name, d[stat], d['Timestamp'].utc.to_i ]
+          ret.push "#{name} #{d[stat]} #{d['Timestamp'].utc.to_i}"
         end
       end
       debug_log "Returning Statistics:"
@@ -143,8 +141,8 @@ module CloudwatchToGraphite
         when 'udp'
           send_udp(results)
         else
-          debug_log "Unknown protocol %s" % @protocol
-          raise CloudwatchToGraphite::ProtocolError
+          debug_log "Unknown protocol #{@protocol}"
+          raise ProtocolError
         end
       end
     end
@@ -152,7 +150,7 @@ module CloudwatchToGraphite
     # set the carbon prefix
     # p:: the string prefix to use
     def carbon_prefix=(p)
-      CloudwatchToGraphite::Validator::string_longer_than(p, 0)
+      Validator::string_longer_than(p, 0)
       @carbon_prefix=p
     end
 

@@ -16,23 +16,32 @@ module CloudwatchToGraphite
   # static methods to validate arguments
   class Validator
     def self.string(n)
-      if not n.kind_of?(String)
-        raise CloudwatchToGraphite::ArgumentTypeError
-      end
+      raise ArgumentTypeError unless n.kind_of?(String)
     end
 
     def self.string_shorter_than(n, length)
-      self::string(n)
-      if n.length >= length
-        raise CloudwatchToGraphite::ArgumentLengthError
-      end
+      string(n)
+      raise ArgumentLengthError unless n.length < length
     end
 
     def self.string_longer_than(n, length)
-      self::string(n)
-      if n.length <= length
-        raise CloudwatchToGraphite::ArgumentLengthError
+      string(n)
+      raise ArgumentLengthError unless n.length > length
+    end
+
+    def self.hash_with_key(h, key)
+      raise ArgumentTypeError unless h.kind_of?(Hash) and h.has_key?(key)
+    end
+
+    def self.hash_with_keys(h, keys)
+      keys.each do |k|
+        hash_with_key(h,k)
       end
+    end
+
+    def self.hash_with_key_of_type(h, key, type)
+      hash_with_key(h, key)
+      raise ArgumentTypeError unless h[key].kind_of?(type)
     end
   end
 end

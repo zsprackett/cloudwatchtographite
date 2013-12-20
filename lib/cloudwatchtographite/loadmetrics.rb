@@ -55,21 +55,16 @@ module CloudwatchToGraphite
     private
     def self.load_content(contents, strict=false)
       metrics = []
-      unless contents.kind_of?(Hash) \
-        and contents.has_key?('metrics') \
-        and contents['metrics'].kind_of?(Array)
-          raise CloudwatchToGraphite::ArgumentTypeError
-      else
-        contents['metrics'].each do |m|
-          parsed = CloudwatchToGraphite::MetricDefinition::create_and_fill m
-          if (parsed != false)
-            metrics.push(parsed)
-          else
-            warn "Failed to parse #{m}."
-          end
+      Validator::hash_with_key_of_type(contents,'metrics',Array)
+      contents['metrics'].each do |m|
+        parsed = MetricDefinition::create_and_fill m
+        if (parsed != false)
+          metrics.push(parsed)
+        else
+          warn "Failed to parse #{m}."
         end
-        metrics
       end
+      metrics
     end
   end
 end
