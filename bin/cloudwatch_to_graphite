@@ -17,6 +17,13 @@
 
 require 'optparse'
 require 'pp'
+require 'log4r'
+
+logger = Log4r::Logger.new('cloudwatchtographite')
+logger.level      = Log4r::ERROR
+f = Log4r::Outputter.stderr
+f.formatter  = Log4r::PatternFormatter.new(:pattern => "[%d] %C: %m")
+logger.outputters = f
 
 begin
   require 'cloudwatchtographite'
@@ -37,7 +44,6 @@ options = {
   :graphite_server  => 'localhost',
   :graphite_port    => 2003,
   :carbon_prefix    => 'cloudwatch',
-  :verbose          => false
 }
 opt_parser = OptionParser.new do |opt|
   opt.banner = "Usage: %s [OPTIONS]" % File.basename($0)
@@ -69,8 +75,17 @@ opt_parser = OptionParser.new do |opt|
   opt.on("-c","--carbon-prefix=prefix","Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
     options[:carbon_prefix] = prefix
   end
+  opt.on("-l","--logfile=prefix","Log file (Default: stderr") do |logfile|
+    f = Log4r::FileOutputter.new(
+      'logfile',
+      :filename => logfile,
+      :trunc    => false
+    )
+    f.formatter  = Log4r::PatternFormatter.new(:pattern => "[%l] %d %C: %m")
+    logger.outputters = f
+  end
   opt.on("-v","--verbose","Increase verbosity") do
-    options[:verbose] = true
+    logger.level = Log4r::DEBUG
   end
   opt.on("-V","--version","Print version and exit") do
     puts File.basename($0) + " " + CloudwatchToGraphite::VERSION::STRING
@@ -109,25 +124,27 @@ end
 metrics = nil
 begin
   if not options[:json_metrics].nil?
+    logger.debug('Parsing JSON metrics')
     metrics = CloudwatchToGraphite::LoadMetrics.from_json_file(options[:json_metrics])
   else
+    logger.debug('Parsing YAML metrics')
     metrics = CloudwatchToGraphite::LoadMetrics.from_yaml_file(options[:yaml_metrics])
   end
 rescue CloudwatchToGraphite::ParseError
-  warn "Failed to parse option file"
+  logger.fatal('Failed to parse option file')
   exit 1
 end
 
 if metrics.empty?
-  warn "Exiting due to lack of metric definitions"
+  logger.fatal('Exiting due to lack of metric definitions')
   exit 1
 end
 
+logger.debug('Initializing CloudwatchToGraphite::Base')
 cwtg = CloudwatchToGraphite::Base.new(
   options[:access_key],
   options[:secret_key],
   options[:region],
-  options[:verbose]
 )
 
 cwtg.carbon_prefix = options[:carbon_prefix]
@@ -135,8 +152,11 @@ cwtg.protocol = options[:protocol]
 cwtg.graphite_server = options[:graphite_server]
 cwtg.graphite_port = options[:graphite_port]
 
+logger.debug('Fetching and forwarding metrics')
 if cwtg.fetch_and_forward(metrics)
+  logger.info('Exiting Success')
   exit 0
 else
+  logger.info('Exiting Failure')
   exit 1
 end

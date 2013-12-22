@@ -2,11 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe CloudwatchToGraphite::Base do
   before :each do
-    @base = CloudwatchToGraphite::Base.new 'foo', 'bar', 'us-east-1', false
+    @base = CloudwatchToGraphite::Base.new 'foo', 'bar', 'us-east-1'
   end
 
   describe ".new" do
-    it "takes four parameters and returns a CloudwatchToGraphite::Base" do
+    it "takes three parameters and returns a CloudwatchToGraphite::Base" do
       @base.should be_an_instance_of CloudwatchToGraphite::Base
     end
   end

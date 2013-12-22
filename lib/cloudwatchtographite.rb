@@ -13,6 +13,7 @@ require_relative './cloudwatchtographite/validator'
 require 'socket'
 require 'fog'
 require 'pp'
+require 'log4r'
 
 module CloudwatchToGraphite
   # This class is responsible for retrieving metrics from CloudWatch and
@@ -29,14 +30,14 @@ module CloudwatchToGraphite
     # region:: The AWS region (eg: us-west-1)
     # verbose:: boolean to enable verbose output
     #
-    def initialize(aws_access_key, aws_secret_key, region, verbose=false)
+    def initialize(aws_access_key, aws_secret_key, region)
+      @logger          = Log4r::Logger.new('cloudwatchtographite::base')
       @protocol        = 'udp'
       @carbon_prefix   = 'cloudwatch'
       @graphite_server = 'localhost'
       @graphite_port   = 2003
-      @verbose         = verbose
 
-      debug_log "Fog setting up for region #{region}"
+      @logger.debug("Fog setting up for region #{region}")
 
       @cloudwatch = Fog::AWS::CloudWatch.new(
         :aws_access_key_id => aws_access_key,
@@ -52,15 +53,15 @@ module CloudwatchToGraphite
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
 
-      debug_log "Attempting to send #{contents.length}  bytes " +
-        "to #{@graphite_server}:#{@graphite_port} via udp"
+      @logger.debug("Attempting to send #{contents.length}  bytes " +
+        "to #{@graphite_server}:#{@graphite_port} via udp")
 
       begin
         sock = UDPSocket.open
         sock.send(contents, 0, @graphite_server, @graphite_port)
         retval = true
       rescue Exception => e
-        debug_log "Caught exception! [#{e}]"
+        @logger.debug("Caught exception! [#{e}]")
         retval = false
       ensure
         sock.close if sock
@@ -75,8 +76,8 @@ module CloudwatchToGraphite
       sock = nil
       contents = contents.join("\n") if contents.kind_of?(Array)
 
-      debug_log "Attempting to send #{contents.length}  bytes " +
-        "to #{@graphite_server}:#{@graphite_port} via tcp"
+      @logger.debug("Attempting to send #{contents.length}  bytes " +
+        "to #{@graphite_server}:#{@graphite_port} via tcp")
 
       retval = false
       begin
@@ -84,7 +85,7 @@ module CloudwatchToGraphite
         sock.print(contents)
         retval = true
       rescue Exception => e
-        debug_log "Caught exception! [#{e}]"
+        @logger.debug("Caught exception! [#{e}]")
       ensure
         sock.close if sock
       end
@@ -97,22 +98,22 @@ module CloudwatchToGraphite
         begin
           ret.concat retrieve_one_datapoint(m)
         rescue Excon::Errors::SocketError, Excon::Errors::BadRequest => e
-          warn "[Error in CloudWatch call] #{e.message}"
+          @logger.error("[Error in CloudWatch call] #{e.message}")
         rescue Excon::Errors::Forbidden
-          warn "[Error in CloudWatch call] permission denied - check keys!"
+          @logger.error(
+            "[Error in CloudWatch call] permission denied - check keys!"
+          )
         end
       end
       ret
     end
 
     def retrieve_one_datapoint(metric)
-      debug_log "Sending to CloudWatch:"
-      debug_object metric.to_h
+      @logger.debug("Sending to CloudWatch: #{metric.to_h}")
       data_points = @cloudwatch.get_metric_statistics(
         metric.to_h
       ).body['GetMetricStatisticsResult']['Datapoints']
-      debug_log "Received from CloudWatch:"
-      debug_object data_points
+      @logger.debug("Received from CloudWatch: #{data_points}")
 
       return retrieve_statistics(metric, order_data_points(data_points))
     end
@@ -125,8 +126,7 @@ module CloudwatchToGraphite
           ret.push "#{name} #{d[stat]} #{d['Timestamp'].utc.to_i}"
         end
       end
-      debug_log "Returning Statistics:"
-      debug_object ret
+      @logger.debug("Returning Statistics: #{ret}")
       ret
     end
 
@@ -141,7 +141,7 @@ module CloudwatchToGraphite
         when 'udp'
           send_udp(results)
         else
-          debug_log "Unknown protocol #{@protocol}"
+          @logger.debug("Unknown protocol #{@protocol}")
           raise ProtocolError
         end
       end
@@ -163,22 +163,10 @@ module CloudwatchToGraphite
       end
 
       if data_points.length == 0
-        warn "No data points!"
+        logger.debug("No data points!")
         data_points
       else
         data_points = data_points.sort_by {|array| array['Timestamp'] }
-      end
-    end
-
-    def debug_log(s)
-      if @verbose
-        warn s
-      end
-    end
-
-    def debug_object(s)
-      if @verbose
-        warn PP.pp(s, "")
       end
     end
   end

@@ -5,6 +5,7 @@ gem 'bundler'
 gem 'unf'
 gem "fog", "~> 1.19.0"
 gem 'hashifiable', '>= 0.1.3'
+gem 'log4r', '~> 1.1.10'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
