@@ -75,7 +75,7 @@ opt_parser = OptionParser.new do |opt|
   opt.on("-c","--carbon-prefix=prefix","Carbon Prefix (Default: #{options[:carbon_prefix]})") do |prefix|
     options[:carbon_prefix] = prefix
   end
-  opt.on("-l","--logfile=prefix","Log file (Default: stderr") do |logfile|
+  opt.on("-l","--logfile=prefix","Log file (Default: stderr)") do |logfile|
     f = Log4r::FileOutputter.new(
       'logfile',
       :filename => logfile,

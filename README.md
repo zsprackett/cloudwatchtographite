@@ -31,6 +31,7 @@ Usage
       -g, --graphite-server=host       Graphite Server (Default: localhost)
       -P, --graphite-port=port         Graphite Port (Default: 2003)
       -c, --carbon-prefix              Carbon Prefix (Default: cloudwatch)
+      -l, --logfile=prefix             Log file (Default: stderr)
       -v, --verbose                    Increase verbosity
       -V, --version                    Print version and exit
       -h, --help                       help
