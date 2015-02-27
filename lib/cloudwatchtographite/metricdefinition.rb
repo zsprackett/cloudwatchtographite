@@ -155,7 +155,7 @@ module CloudwatchToGraphite
        self.Namespace,
        self.MetricName,
        stat,
-       @Dimensions.join('.')
+       @Dimensions[0].Value
      ]
      path.gsub('/', '.').downcase
     end
