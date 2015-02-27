@@ -1,27 +1,27 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 
 describe CloudwatchToGraphite::MetricDefinition do
   before :each do
     @definition = FactoryGirl.build(
       :metricdefinition,
-      MetricName: 'foometricname',
-      Namespace:  'foonamespace',
-      Unit:       'Bits'
+      :MetricName => "foometricname",
+      :Namespace  => "foonamespace",
+      :Unit       => "Bits"
     )
 
-    @valid_string = 'a' * 255
-    @invalid_string = 'z' * 256
+    @valid_string = "a" * 255
+    @invalid_string = "z" * 256
   end
 
   describe ".create_and_fill" do
     it "should be a MetricDefinition" do
-      @definition.should be_an_instance_of \
+      expect(@definition).to be_an_instance_of \
         CloudwatchToGraphite::MetricDefinition
     end
     it "should require valid arguments" do
       expect {
         CloudwatchToGraphite::MetricDefinition.create_and_fill(
-          {'namespace' => 'blah'}
+          "namespace" => "blah"
         )
       }.to raise_error(CloudwatchToGraphite::ParseError)
     end
@@ -30,13 +30,13 @@ describe CloudwatchToGraphite::MetricDefinition do
   describe ".new" do
     it "takes no parameters and returns a MetricDefinition" do
       d = CloudwatchToGraphite::MetricDefinition.new
-      d.should be_an_instance_of CloudwatchToGraphite::MetricDefinition
+      expect(d).to be_an_instance_of CloudwatchToGraphite::MetricDefinition
     end
   end
 
   describe ".Namespace" do
     it "returns the correct namespace" do
-      @definition.Namespace.should eql 'foonamespace'
+      expect(@definition.Namespace).to eql "foonamespace"
     end
   end
 
@@ -49,13 +49,13 @@ describe CloudwatchToGraphite::MetricDefinition do
         @definition.Namespace = @invalid_string
       }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @definition.Namespace = @valid_string
-      @definition.Namespace.should eql @valid_string
+      expect(@definition.Namespace).to eql @valid_string
     end
   end
 
   describe ".MetricName" do
     it "returns the correct metricname" do
-      @definition.MetricName.should eql 'foometricname'
+      expect(@definition.MetricName).to eql "foometricname"
     end
   end
 
@@ -68,24 +68,24 @@ describe CloudwatchToGraphite::MetricDefinition do
         @definition.MetricName = @invalid_string
       }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @definition.MetricName = @valid_string
-      @definition.MetricName.should eql @valid_string
+      expect(@definition.MetricName).to eql @valid_string
     end
   end
 
   describe ".Statistics" do
     it "returns the correct statistics" do
       statistics = @definition.Statistics
-      statistics.should be_an Array
-      statistics.should include 'Sum'
-      statistics.should include 'Average'
-      statistics.should have(2).items
+      expect(statistics).to be_an Array
+      expect(statistics).to include "Sum"
+      expect(statistics).to include "Average"
+      expect(statistics.count).to eq(2)
     end
   end
 
   describe ".add_statistic" do
     it "only accepts valid arguments" do
       expect {
-        @definition.add_statistic('NotValid')
+        @definition.add_statistic("NotValid")
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
     end
   end
@@ -97,24 +97,24 @@ describe CloudwatchToGraphite::MetricDefinition do
         @definition.add_dimension(d)
       end
       expect {
-          @definition.add_dimension(FactoryGirl.build(:metricdimension))
+        @definition.add_dimension(FactoryGirl.build(:metricdimension))
       }.to raise_error(CloudwatchToGraphite::TooManyDimensionError)
     end
   end
 
   describe ".Period" do
     it "returns the correct period" do
-      @definition.Period.should eql 90
+      expect(@definition.Period).to eql 90
     end
   end
 
   describe ".Period=" do
     it "only accepts valid arguments" do
       expect {
-        @definition.Period = 'abc'
+        @definition.Period = "abc"
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
       @definition.Period = 1
-      @definition.Period.should eql 1
+      expect(@definition.Period).to eql 1
     end
   end
 
@@ -125,19 +125,19 @@ describe CloudwatchToGraphite::MetricDefinition do
         @definition.add_dimension(d)
       end
       dimensions = @definition.Dimensions
-      dimensions.should be_an Array
-      dimensions.should have(2).items
+      expect(dimensions).to be_an Array
+      expect(dimensions.count).to eq(2)
       dimensions.each do |d|
-        d.should be_a Hash
-        d.should have_key('Name')
-        d.should have_key('Value')
+        expect(d).to be_a Hash
+        expect(d).to have_key("Name")
+        expect(d).to have_key("Value")
       end
     end
   end
 
   describe ".Unit" do
     it "returns the correct unit" do
-      @definition.Unit.should eql 'Bits'
+      expect(@definition.Unit).to eql "Bits"
     end
   end
 end
