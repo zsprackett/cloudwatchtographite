@@ -4,16 +4,16 @@
 # License:: The MIT License (MIT)
 # Copyright:: Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
 #
-require_relative './cloudwatchtographite/exception'
-require_relative './cloudwatchtographite/version'
-require_relative './cloudwatchtographite/metricdefinition'
-require_relative './cloudwatchtographite/metricdimension'
-require_relative './cloudwatchtographite/loadmetrics'
-require_relative './cloudwatchtographite/validator'
-require 'socket'
-require 'fog'
-require 'pp'
-require 'log4r'
+require_relative "./cloudwatchtographite/exception"
+require_relative "./cloudwatchtographite/version"
+require_relative "./cloudwatchtographite/metricdefinition"
+require_relative "./cloudwatchtographite/metricdimension"
+require_relative "./cloudwatchtographite/loadmetrics"
+require_relative "./cloudwatchtographite/validator"
+require "socket"
+require "fog"
+require "pp"
+require "log4r"
 
 module CloudwatchToGraphite
   # This class is responsible for retrieving metrics from CloudWatch and
@@ -22,7 +22,7 @@ module CloudwatchToGraphite
     attr_accessor :protocol
     attr_accessor :graphite_server
     attr_accessor :graphite_port
-    attr_reader   :carbon_prefix
+    attr_reader :carbon_prefix
 
     # Initialize the CloudwatchToGraphite::Base object.
     # aws_access_key:: The AWS user key
@@ -31,18 +31,18 @@ module CloudwatchToGraphite
     # verbose:: boolean to enable verbose output
     #
     def initialize(aws_access_key, aws_secret_key, region)
-      @logger          = Log4r::Logger.new('cloudwatchtographite::base')
-      @protocol        = 'udp'
-      @carbon_prefix   = 'cloudwatch'
-      @graphite_server = 'localhost'
+      @logger          = Log4r::Logger.new("cloudwatchtographite::base")
+      @protocol        = "udp"
+      @carbon_prefix   = "cloudwatch"
+      @graphite_server = "localhost"
       @graphite_port   = 2003
 
       @logger.debug("Fog setting up for region #{region}")
 
       @cloudwatch = Fog::AWS::CloudWatch.new(
-        :aws_access_key_id => aws_access_key,
+        :aws_access_key_id     => aws_access_key,
         :aws_secret_access_key => aws_secret_key,
-        :region => region
+        :region                => region
       )
     end
 
@@ -51,9 +51,9 @@ module CloudwatchToGraphite
     #
     def send_udp(contents)
       sock = nil
-      contents = contents.join("\n") if contents.kind_of?(Array)
+      contents = contents.join("\n") if contents.is_a?(Array)
 
-      @logger.debug("Attempting to send #{contents.length}  bytes " +
+      @logger.debug("Attempting to send #{contents.length}  bytes " \
         "to #{@graphite_server}:#{@graphite_port} via udp")
 
       begin
@@ -74,9 +74,9 @@ module CloudwatchToGraphite
     #
     def send_tcp(contents)
       sock = nil
-      contents = contents.join("\n") if contents.kind_of?(Array)
+      contents = contents.join("\n") if contents.is_a?(Array)
 
-      @logger.debug("Attempting to send #{contents.length}  bytes " +
+      @logger.debug("Attempting to send #{contents.length}  bytes " \
         "to #{@graphite_server}:#{@graphite_port} via tcp")
 
       retval = false
@@ -112,10 +112,10 @@ module CloudwatchToGraphite
       @logger.debug("Sending to CloudWatch: #{metric.to_h}")
       data_points = @cloudwatch.get_metric_statistics(
         metric.to_h
-      ).body['GetMetricStatisticsResult']['Datapoints']
+      ).body["GetMetricStatisticsResult"]["Datapoints"]
       @logger.debug("Received from CloudWatch: #{data_points}")
 
-      return retrieve_statistics(metric, order_data_points(data_points))
+      retrieve_statistics(metric, order_data_points(data_points))
     end
 
     def retrieve_statistics(metric, data_points)
@@ -136,13 +136,13 @@ module CloudwatchToGraphite
         false
       else
         case @protocol
-        when 'tcp'
+        when "tcp"
           send_tcp(results)
-        when 'udp'
+        when "udp"
           send_udp(results)
         else
           @logger.debug("Unknown protocol #{@protocol}")
-          raise ProtocolError
+          fail ProtocolError
         end
       end
     end
@@ -150,11 +150,12 @@ module CloudwatchToGraphite
     # set the carbon prefix
     # p:: the string prefix to use
     def carbon_prefix=(p)
-      Validator::string_longer_than(p, 0)
-      @carbon_prefix=p
+      Validator.string_longer_than(p, 0)
+      @carbon_prefix = p
     end
 
     private
+
     def order_data_points(data_points)
       if data_points.nil?
         data_points = []
@@ -166,7 +167,7 @@ module CloudwatchToGraphite
         logger.debug("No data points!")
         data_points
       else
-        data_points = data_points.sort_by {|array| array['Timestamp'] }
+        data_points = data_points.sort_by { |array| array["Timestamp"] }
       end
     end
   end
