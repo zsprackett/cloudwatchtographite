@@ -1,26 +1,26 @@
-source 'http://rubygems.org'
+source "http://rubygems.org"
 
 # Required gems
-gem 'bundler'
-gem 'unf'
+gem "bundler"
+gem "unf"
 gem "fog", "~> 1.19.0"
-gem 'hashifiable', '>= 0.1.3'
-gem 'log4r', '~> 1.1.10'
+gem "hashifiable", ">= 0.1.3"
+gem "log4r", "~> 1.1.10"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
-  gem 'rdoc'
-  gem 'rspec'
-  gem 'rspec-mocks'
-  gem 'jeweler'
-  gem 'cane'
+  gem "rdoc"
+  gem "rspec"
+  gem "rspec-mocks"
+  gem "jeweler"
+  gem "cane"
   gem "factory_girl"
 end
 
 group :test do
-  gem 'rspec'
-  gem 'rspec-mocks'
+  gem "rspec"
+  gem "rspec-mocks"
   gem "factory_girl"
-  gem 'coveralls', require: false
+  gem "coveralls", :require => false
 end

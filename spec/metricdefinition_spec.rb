@@ -1,16 +1,16 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + "/spec_helper")
 
 describe CloudwatchToGraphite::MetricDefinition do
   before :each do
     @definition = FactoryGirl.build(
       :metricdefinition,
-      MetricName: 'foometricname',
-      Namespace:  'foonamespace',
-      Unit:       'Bits'
+      :MetricName => "foometricname",
+      :Namespace  => "foonamespace",
+      :Unit       => "Bits"
     )
 
-    @valid_string = 'a' * 255
-    @invalid_string = 'z' * 256
+    @valid_string = "a" * 255
+    @invalid_string = "z" * 256
   end
 
   describe ".create_and_fill" do
@@ -21,7 +21,7 @@ describe CloudwatchToGraphite::MetricDefinition do
     it "should require valid arguments" do
       expect {
         CloudwatchToGraphite::MetricDefinition.create_and_fill(
-          {'namespace' => 'blah'}
+          "namespace" => "blah"
         )
       }.to raise_error(CloudwatchToGraphite::ParseError)
     end
@@ -36,7 +36,7 @@ describe CloudwatchToGraphite::MetricDefinition do
 
   describe ".Namespace" do
     it "returns the correct namespace" do
-      @definition.Namespace.should eql 'foonamespace'
+      @definition.Namespace.should eql "foonamespace"
     end
   end
 
@@ -55,7 +55,7 @@ describe CloudwatchToGraphite::MetricDefinition do
 
   describe ".MetricName" do
     it "returns the correct metricname" do
-      @definition.MetricName.should eql 'foometricname'
+      @definition.MetricName.should eql "foometricname"
     end
   end
 
@@ -76,8 +76,8 @@ describe CloudwatchToGraphite::MetricDefinition do
     it "returns the correct statistics" do
       statistics = @definition.Statistics
       statistics.should be_an Array
-      statistics.should include 'Sum'
-      statistics.should include 'Average'
+      statistics.should include "Sum"
+      statistics.should include "Average"
       statistics.should have(2).items
     end
   end
@@ -85,7 +85,7 @@ describe CloudwatchToGraphite::MetricDefinition do
   describe ".add_statistic" do
     it "only accepts valid arguments" do
       expect {
-        @definition.add_statistic('NotValid')
+        @definition.add_statistic("NotValid")
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
     end
   end
@@ -97,7 +97,7 @@ describe CloudwatchToGraphite::MetricDefinition do
         @definition.add_dimension(d)
       end
       expect {
-          @definition.add_dimension(FactoryGirl.build(:metricdimension))
+        @definition.add_dimension(FactoryGirl.build(:metricdimension))
       }.to raise_error(CloudwatchToGraphite::TooManyDimensionError)
     end
   end
@@ -111,7 +111,7 @@ describe CloudwatchToGraphite::MetricDefinition do
   describe ".Period=" do
     it "only accepts valid arguments" do
       expect {
-        @definition.Period = 'abc'
+        @definition.Period = "abc"
       }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
       @definition.Period = 1
       @definition.Period.should eql 1
@@ -129,15 +129,15 @@ describe CloudwatchToGraphite::MetricDefinition do
       dimensions.should have(2).items
       dimensions.each do |d|
         d.should be_a Hash
-        d.should have_key('Name')
-        d.should have_key('Value')
+        d.should have_key("Name")
+        d.should have_key("Value")
       end
     end
   end
 
   describe ".Unit" do
     it "returns the correct unit" do
-      @definition.Unit.should eql 'Bits'
+      @definition.Unit.should eql "Bits"
     end
   end
 end

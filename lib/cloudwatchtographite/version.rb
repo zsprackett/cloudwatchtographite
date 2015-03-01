@@ -17,9 +17,9 @@ module CloudwatchToGraphite
     MAJOR = 0
     MINOR = 0
     PATCH = 1
-    BUILD = ''
+    BUILD = ""
 
-    STRING = [MAJOR, MINOR, PATCH].compact.join('.') \
-      + (BUILD.empty? ? '' : ".#{BUILD}")
+    STRING = [MAJOR, MINOR, PATCH].compact.join(".") \
+      + (BUILD.empty? ? "" : ".#{BUILD}")
   end
 end

@@ -12,8 +12,8 @@
 # == Copyright
 # Copyright (C) 2013 - S. Zachariah Sprackett <zac@sprackett.com>
 #
-require 'json'
-require 'yaml'
+require "json"
+require "yaml"
 
 module CloudwatchToGraphite
   # Load metrics from a file and parse them into a
@@ -21,11 +21,11 @@ module CloudwatchToGraphite
   #
   class LoadMetrics
     def self.from_json_file(filename)
-      if not File.readable?(filename)
+      if !File.readable?(filename)
         warn "Unable to read %s" % filename
         []
       else
-        File.open(filename, 'r') do |f|
+        File.open(filename, "r") do |f|
           begin
             contents = JSON.load(f)
             load_content(contents)
@@ -38,7 +38,7 @@ module CloudwatchToGraphite
     end
 
     def self.from_yaml_file(filename)
-      if not File.readable?(filename)
+      if !File.readable?(filename)
         warn "Unable to read %s" % filename
         []
       else
@@ -53,11 +53,12 @@ module CloudwatchToGraphite
     end
 
     private
-    def self.load_content(contents, strict=false)
+
+    def self.load_content(contents, _strict = false)
       metrics = []
-      Validator::hash_with_key_of_type(contents,'metrics',Array)
-      contents['metrics'].each do |m|
-        parsed = MetricDefinition::create_and_fill m
+      Validator.hash_with_key_of_type(contents, "metrics", Array)
+      contents["metrics"].each do |m|
+        parsed = MetricDefinition.create_and_fill m
         if (parsed != false)
           metrics.push(parsed)
         else
