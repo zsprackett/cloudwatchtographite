@@ -11,16 +11,11 @@ gem 'log4r', '~> 1.1.10'
 # Include everything needed to run rake, tests, features, etc.
 group :development do
   gem 'rdoc'
-  gem 'rspec'
-  gem 'rspec-mocks'
   gem 'jeweler'
   gem 'cane'
-  gem "factory_girl"
-end
-
-group :test do
   gem 'rspec'
   gem 'rspec-mocks'
+  gem 'rspec-collection_matchers'
   gem "factory_girl"
   gem 'coveralls', require: false
 end

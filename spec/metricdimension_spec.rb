@@ -13,8 +13,8 @@ describe CloudwatchToGraphite::MetricDimension do
 
   describe ".new" do
     it "takes two parameters and returns a MetricDimension" do
-      @dimension.should be_an_instance_of \
-        CloudwatchToGraphite::MetricDimension
+      expect(@dimension).to \
+        be_an_instance_of(CloudwatchToGraphite::MetricDimension)
     end
   end
 
@@ -23,7 +23,7 @@ describe CloudwatchToGraphite::MetricDimension do
       d = CloudwatchToGraphite::MetricDimension.create_from_hash(
         {'name' => 'a', 'value' => 'b'}
       )
-      d.should be_an_instance_of CloudwatchToGraphite::MetricDimension
+      expect(d).to be_an_instance_of(CloudwatchToGraphite::MetricDimension)
     end
     it "should require valid arguments" do
       expect {
@@ -36,7 +36,7 @@ describe CloudwatchToGraphite::MetricDimension do
 
   describe ".Name" do
     it "returns the correct name" do
-      @dimension.Name.should eql 'testname'
+      expect(@dimension.Name).to eql('testname')
     end
   end
 
@@ -49,13 +49,13 @@ describe CloudwatchToGraphite::MetricDimension do
         @dimension.Name = @invalid_string
       }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @dimension.Name = @valid_string
-      @dimension.Name.should eql @valid_string
+      expect(@dimension.Name).to eql(@valid_string)
     end
   end
 
   describe ".Name" do
     it "returns the correct value" do
-      @dimension.Value.should eql 'testval'
+      expect(@dimension.Value).to eql('testval')
     end
   end
 
@@ -68,7 +68,7 @@ describe CloudwatchToGraphite::MetricDimension do
         @dimension.Value = @invalid_string
       }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @dimension.Value = @valid_string
-      @dimension.Value.should eql @valid_string
+      expect(@dimension.Value).to eql(@valid_string)
     end
   end
 end

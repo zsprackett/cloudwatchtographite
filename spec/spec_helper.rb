@@ -2,6 +2,8 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 require 'coveralls'
 require 'rspec'
 require 'factory_girl'
+require 'rspec/collection_matchers'
+
 RSpec.configure do |config|
     config.include FactoryGirl::Syntax::Methods
 end
