@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+# frozen_string_literal: true
 #
 # Author:: S. Zachariah Sprackett <zac@sprackett.com>
 # License:: The MIT License (MIT)
@@ -40,9 +41,9 @@ module CloudwatchToGraphite
       @logger.debug("Fog setting up for region #{region}")
 
       @cloudwatch = Fog::AWS::CloudWatch.new(
-        :aws_access_key_id => aws_access_key,
-        :aws_secret_access_key => aws_secret_key,
-        :region => region
+        aws_access_key_id: aws_access_key,
+        aws_secret_access_key: aws_secret_key,
+        region: region
       )
     end
 
@@ -51,9 +52,9 @@ module CloudwatchToGraphite
     #
     def send_udp(contents)
       sock = nil
-      contents = contents.join("\n") if contents.kind_of?(Array)
+      contents = contents.join("\n") if contents.is_a?(Array)
 
-      @logger.debug("Attempting to send #{contents.length}  bytes " +
+      @logger.debug("Attempting to send #{contents.length}  bytes " \
         "to #{@graphite_server}:#{@graphite_port} via udp")
 
       begin
@@ -64,7 +65,7 @@ module CloudwatchToGraphite
         @logger.debug("Caught exception! [#{e}]")
         retval = false
       ensure
-        sock.close if sock
+        sock&.close
       end
       retval
     end
@@ -74,9 +75,9 @@ module CloudwatchToGraphite
     #
     def send_tcp(contents)
       sock = nil
-      contents = contents.join("\n") if contents.kind_of?(Array)
+      contents = contents.join("\n") if contents.is_a?(Array)
 
-      @logger.debug("Attempting to send #{contents.length}  bytes " +
+      @logger.debug("Attempting to send #{contents.length}  bytes " \
         "to #{@graphite_server}:#{@graphite_port} via tcp")
 
       retval = false
@@ -87,7 +88,7 @@ module CloudwatchToGraphite
       rescue Exception => e
         @logger.debug("Caught exception! [#{e}]")
       ensure
-        sock.close if sock
+        sock&.close
       end
       retval
     end
@@ -101,7 +102,7 @@ module CloudwatchToGraphite
           @logger.error("[Error in CloudWatch call] #{e.message}")
         rescue Excon::Errors::Forbidden
           @logger.error(
-            "[Error in CloudWatch call] permission denied - check keys!"
+            '[Error in CloudWatch call] permission denied - check keys!'
           )
         end
       end
@@ -115,7 +116,7 @@ module CloudwatchToGraphite
       ).body['GetMetricStatisticsResult']['Datapoints']
       @logger.debug("Received from CloudWatch: #{data_points}")
 
-      return retrieve_statistics(metric, order_data_points(data_points))
+      retrieve_statistics(metric, order_data_points(data_points))
     end
 
     def retrieve_statistics(metric, data_points)
@@ -132,7 +133,7 @@ module CloudwatchToGraphite
 
     def fetch_and_forward(metrics)
       results = retrieve_datapoints(metrics)
-      if results.length == 0
+      if results.empty?
         false
       else
         case @protocol
@@ -150,23 +151,24 @@ module CloudwatchToGraphite
     # set the carbon prefix
     # p:: the string prefix to use
     def carbon_prefix=(p)
-      Validator::string_longer_than(p, 0)
-      @carbon_prefix=p
+      Validator.string_longer_than(p, 0)
+      @carbon_prefix = p
     end
 
     private
-    def order_data_points(data_points)
-      if data_points.nil?
-        data_points = []
-      else
-        data_points = Array(data_points)
-      end
 
-      if data_points.length == 0
-        logger.debug("No data points!")
+    def order_data_points(data_points)
+      data_points = if data_points.nil?
+                      []
+                    else
+                      Array(data_points)
+                    end
+
+      if data_points.empty?
+        logger.debug('No data points!')
         data_points
       else
-        data_points = data_points.sort_by {|array| array['Timestamp'] }
+        data_points.sort_by { |array| array['Timestamp'] }
       end
     end
   end

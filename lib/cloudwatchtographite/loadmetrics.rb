@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+# frozen_string_literal: true
 # == Synopsis
 # CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
 # and passes them on to a graphite server
@@ -21,8 +22,8 @@ module CloudwatchToGraphite
   #
   class LoadMetrics
     def self.from_json_file(filename)
-      if not File.readable?(filename)
-        warn "Unable to read %s" % filename
+      if !File.readable?(filename)
+        warn 'Unable to read %s' % filename
         []
       else
         File.open(filename, 'r') do |f|
@@ -30,7 +31,7 @@ module CloudwatchToGraphite
             contents = JSON.load(f)
             load_content(contents)
           rescue Exception
-            warn "Failed to parse %s" % filename
+            warn 'Failed to parse %s' % filename
             []
           end
         end
@@ -38,27 +39,28 @@ module CloudwatchToGraphite
     end
 
     def self.from_yaml_file(filename)
-      if not File.readable?(filename)
-        warn "Unable to read %s" % filename
+      if !File.readable?(filename)
+        warn 'Unable to read %s' % filename
         []
       else
         begin
           contents = YAML.load_file(filename)
           load_content(contents)
         rescue Exception
-          warn "Failed to parse %s" % filename
+          warn 'Failed to parse %s' % filename
           []
         end
       end
     end
 
     private
-    def self.load_content(contents, strict=false)
+
+    def self.load_content(contents, _strict = false)
       metrics = []
-      Validator::hash_with_key_of_type(contents,'metrics',Array)
+      Validator.hash_with_key_of_type(contents, 'metrics', Array)
       contents['metrics'].each do |m|
-        parsed = MetricDefinition::create_and_fill m
-        if (parsed != false)
+        parsed = MetricDefinition.create_and_fill m
+        if parsed != false
           metrics.push(parsed)
         else
           warn "Failed to parse #{m}."

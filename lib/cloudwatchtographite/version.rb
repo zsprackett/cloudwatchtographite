@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+# frozen_string_literal: true
 # == Synopsis
 # CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
 # and passes them on to a graphite server

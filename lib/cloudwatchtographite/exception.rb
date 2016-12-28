@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+# frozen_string_literal: true
 # == Synopsis
 # CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
 # and passes them on to a graphite server
@@ -17,7 +18,7 @@ module CloudwatchToGraphite
   class Exception < ::RuntimeError; end
 
   # Raised when the arguments are wrong
-  class ArgumentError < Exception; end
+  class ArgumentError < RuntimeError; end
 
   # Raised when an argument is too long
   class ArgumentLengthError < ArgumentError; end
@@ -26,11 +27,11 @@ module CloudwatchToGraphite
   class ArgumentTypeError < ArgumentError; end
 
   # Raised when too many dimensions are specified
-  class TooManyDimensionError < Exception; end
+  class TooManyDimensionError < RuntimeError; end
 
   # Raised when parsing fails
-  class ParseError < Exception; end
+  class ParseError < RuntimeError; end
 
   # Raised when an unknown protocol is used to try to send to graphite
-  class ProtocolError < Exception; end
+  class ProtocolError < RuntimeError; end
 end

@@ -1,16 +1,16 @@
+# frozen_string_literal: true
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe CloudwatchToGraphite::LoadMetrics do
-
-  describe "#load_content" do
-    it "it should not load invalid metrics" do
-      content = {'shmetrics' => 'foo'}
-      expect {
-        CloudwatchToGraphite::LoadMetrics::load_content(content)
-      }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+  describe '#load_content' do
+    it 'it should not load invalid metrics' do
+      content = { 'shmetrics' => 'foo' }
+      expect do
+        CloudwatchToGraphite::LoadMetrics.load_content(content)
+      end.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
     end
 
-    #it "it should load valid metrics" do
+    # it "it should load valid metrics" do
     #  content = {
     #    'metrics'    => [ {
     #      'namespace'  => 'thenamespace',
@@ -22,6 +22,6 @@ describe CloudwatchToGraphite::LoadMetrics do
     #  }
     #  metrics = CloudwatchToGraphite::LoadMetrics::load_content(content)
     #  metrics.should be_an(Array)
-    #end
+    # end
   end
 end

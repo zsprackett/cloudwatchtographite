@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe CloudwatchToGraphite::MetricDimension do
@@ -11,62 +12,62 @@ describe CloudwatchToGraphite::MetricDimension do
     @invalid_string = 'z' * 256
   end
 
-  describe ".new" do
-    it "takes two parameters and returns a MetricDimension" do
+  describe '.new' do
+    it 'takes two parameters and returns a MetricDimension' do
       expect(@dimension).to \
         be_an_instance_of(CloudwatchToGraphite::MetricDimension)
     end
   end
 
-  describe ".create_from_hash" do
-    it "should return a MetricDimension" do
+  describe '.create_from_hash' do
+    it 'should return a MetricDimension' do
       d = CloudwatchToGraphite::MetricDimension.create_from_hash(
-        {'name' => 'a', 'value' => 'b'}
+        'name' => 'a', 'value' => 'b'
       )
       expect(d).to be_an_instance_of(CloudwatchToGraphite::MetricDimension)
     end
-    it "should require valid arguments" do
-      expect {
+    it 'should require valid arguments' do
+      expect do
         CloudwatchToGraphite::MetricDimension.create_from_hash(
-          {'name' => 'blah'}
+          'name' => 'blah'
         )
-      }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      end.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
     end
   end
 
-  describe ".Name" do
-    it "returns the correct name" do
+  describe '.Name' do
+    it 'returns the correct name' do
       expect(@dimension.Name).to eql('testname')
     end
   end
 
-  describe ".Name=" do
-    it "only accepts valid arguments" do
-      expect {
+  describe '.Name=' do
+    it 'only accepts valid arguments' do
+      expect do
         @dimension.Name = 123
-      }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
-      expect {
+      end.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      expect do
         @dimension.Name = @invalid_string
-      }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
+      end.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @dimension.Name = @valid_string
       expect(@dimension.Name).to eql(@valid_string)
     end
   end
 
-  describe ".Name" do
-    it "returns the correct value" do
+  describe '.Name' do
+    it 'returns the correct value' do
       expect(@dimension.Value).to eql('testval')
     end
   end
 
-  describe ".Value=" do
-    it "only accepts valid arguments" do
-      expect {
+  describe '.Value=' do
+    it 'only accepts valid arguments' do
+      expect do
         @dimension.Value = 123
-      }.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
-      expect {
+      end.to raise_error(CloudwatchToGraphite::ArgumentTypeError)
+      expect do
         @dimension.Value = @invalid_string
-      }.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
+      end.to raise_error(CloudwatchToGraphite::ArgumentLengthError)
       @dimension.Value = @valid_string
       expect(@dimension.Value).to eql(@valid_string)
     end

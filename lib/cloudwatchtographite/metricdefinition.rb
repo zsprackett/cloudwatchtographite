@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+# frozen_string_literal: true
 # == Synopsis
 # CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
 # and passes them on to a graphite server
@@ -39,15 +40,15 @@ module CloudwatchToGraphite
     'Gigabits/Second',
     'Terabits/Second',
     'Count/Second'
-  ]
+  ].freeze
 
-  STATISTICS = [
-    'Minimum',
-    'Maximum',
-    'Sum',
-    'Average',
-    'SampleCount'
-  ]
+  STATISTICS = %w(
+    Minimum
+    Maximum
+    Sum
+    Average
+    SampleCount
+  ).freeze
 
   SETTER_MAPPINGS = {
     'namespace'  => :Namespace=,
@@ -58,7 +59,7 @@ module CloudwatchToGraphite
     'period'     => :Period=,
     'dimensions' => :Dimensions=,
     'unit'       => :Unit=
-  }
+  }.freeze
 
   # A hashable representation of an AWS CloudWatch metric
   #
@@ -66,7 +67,7 @@ module CloudwatchToGraphite
     attr_reader :Namespace, :MetricName, :Statistics, :Unit, :Period
     extend Hashifiable
     hashify 'Namespace', 'MetricName', 'Statistics', 'StartTime', \
-      'EndTime', 'Period', 'Dimensions'#, 'Unit'
+            'EndTime', 'Period', 'Dimensions' # , 'Unit'
 
     def initialize
       @Unit = UNITS[0]
@@ -76,31 +77,31 @@ module CloudwatchToGraphite
     end
 
     def Namespace=(n)
-      Validator::string_shorter_than(n, 256)
-      @Namespace=n
+      Validator.string_shorter_than(n, 256)
+      @Namespace = n
     end
 
     def MetricName=(n)
-      Validator::string_shorter_than(n, 256)
-      @MetricName=n
+      Validator.string_shorter_than(n, 256)
+      @MetricName = n
     end
 
     def StartTime=(time)
-      raise ArgumentTypeError unless time.kind_of?(Time)
-      @StartTime=time
+      raise ArgumentTypeError unless time.is_a?(Time)
+      @StartTime = time
     end
 
     def StartTime
       if @StartTime.nil?
-        (Time.now-600).iso8601
+        (Time.now - 600).iso8601
       else
         @StartTime.iso8601
       end
     end
 
     def EndTime=(time)
-      raise ArgumentTypeError unless time.kind_of?(Time)
-      @EndTime=time
+      raise ArgumentTypeError unless time.is_a?(Time)
+      @EndTime = time
     end
 
     def EndTime
@@ -112,7 +113,7 @@ module CloudwatchToGraphite
     end
 
     def Period=(n)
-      raise ArgumentTypeError unless n.kind_of? Integer
+      raise ArgumentTypeError unless n.is_a? Integer
       @Period = n
     end
 
@@ -127,13 +128,11 @@ module CloudwatchToGraphite
 
     def add_statistic(n)
       raise ArgumentTypeError unless STATISTICS.include? n
-      if not @Statistics.include? n
-        @Statistics.push(n)
-      end
+      @Statistics.push(n) unless @Statistics.include? n
     end
 
     def add_dimension(n)
-      if not n.kind_of?(MetricDimension)
+      if !n.is_a?(MetricDimension)
         raise ArgumentTypeError
       elsif @Dimensions.length >= 10
         raise TooManyDimensionError
@@ -142,22 +141,22 @@ module CloudwatchToGraphite
     end
 
     def valid?
-      if @Namespace.nil? or @MetricName.nil? or @Statistics.empty? \
-        or @Dimensions.empty? or @Unit.nil?
-          false
+      if @Namespace.nil? || @MetricName.nil? || @Statistics.empty? \
+        || @Dimensions.empty? || @Unit.nil?
+        false
       else
         true
       end
     end
 
     def graphite_path(stat)
-     path = "%s.%s.%s.%s" % [
-       self.Namespace,
-       self.MetricName,
-       stat,
-       @Dimensions.join('.')
-     ]
-     path.gsub('/', '.').downcase
+      path = '%s.%s.%s.%s' % [
+        self.Namespace,
+        self.MetricName,
+        stat,
+        @Dimensions.join('.')
+      ]
+      path.tr('/', '.').downcase
     end
 
     def self.create_and_fill(definition)
@@ -168,7 +167,7 @@ module CloudwatchToGraphite
         )
       end
       raise ParseError unless md.valid?
-      return md
+      md
     end
 
     def self.populate_metric_definition(md, key, value)

@@ -1,4 +1,5 @@
 # _*_ coding: utf-8 _*_
+# frozen_string_literal: true
 # == Synopsis
 # CloudwatchToGraphite retrieves metrics from the Amazon CloudWatch APIs
 # and passes them on to a graphite server
@@ -20,13 +21,13 @@ module CloudwatchToGraphite
     hashify 'Name', 'Value'
 
     def Name=(n)
-      Validator::string_shorter_than(n, 256)
-      @Name=n
+      Validator.string_shorter_than(n, 256)
+      @Name = n
     end
 
     def Value=(n)
-      Validator::string_shorter_than(n, 256)
-      @Value=n
+      Validator.string_shorter_than(n, 256)
+      @Value = n
     end
 
     def self.create(name, value)
@@ -37,9 +38,9 @@ module CloudwatchToGraphite
     end
 
     def self.create_from_hash(dhash)
-      Validator::hash_with_keys(dhash, ['name', 'value'])
+      Validator.hash_with_keys(dhash, %w(name value))
 
-      MetricDimension::create(
+      MetricDimension.create(
         dhash['name'],
         dhash['value']
       )
