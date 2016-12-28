@@ -99,7 +99,7 @@ Contributing
   * Look at the [test coverage](https://coveralls.io/r/zsprackett/cloudwatchtographite) for code in need of rspec tests.
   * Do something else cool!
 * Fork the project and do your work in a topic branch.
-  * Make sure your changes will work on both Ruby 1.9.3 and Ruby 2.0
+  * Make sure your changes will work on both Ruby 2.2 and Ruby 2.3
 * Add tests to prove your code works and run all the tests using `bundle exec rake`.
 * Rebase your branch against `zsprackett/cloudwatchtographite` to make sure everything is up to date.
 * Commit your changes and send a pull request.
@@ -134,7 +134,3 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/zsprackett/cloudwatchtographite/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
