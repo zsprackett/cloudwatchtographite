@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 # Required gems
 gem 'bundler', '~> 1.13'
 gem 'unf', '~> 0.1'
-gem 'fog', '~> 1.19', '>= 1.19.0'
+gem 'fog', '~> 1.38', '>= 1.38.0'
 gem 'hashifiable', '~> 0.1', '>= 0.1.3'
 gem 'log4r', '~> 1.1', '>= 1.1.10'
 
